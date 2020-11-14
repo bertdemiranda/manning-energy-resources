@@ -1,0 +1,27 @@
+{
+  "namespace": "com.example.ingestbattevents.avro",
+  "type": "record",
+  "name": "DeviceEventAvro",
+  "fields": [
+    {
+        "name": "device_id",
+        "type": ["string", "null"],
+        "default": ""
+    }
+    ,{
+        "name": "charging",
+        "type": ["int","null"],
+        "default": 0
+    }
+    ,{
+        "name": "charging_source",
+        "type": ["string", "null"],
+        "default": ""
+    }
+    ,{
+        "name": "current_capacity",
+        "type": ["int","null"],
+        "default": 0
+    }
+    ]
+}

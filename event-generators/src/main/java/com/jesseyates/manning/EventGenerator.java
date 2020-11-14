@@ -67,14 +67,14 @@ public class EventGenerator extends BaseGenerator {
     events.put("charging_source", new ImmutablePair<>("solar", "utility"));
     events.put("current_capacity", new ImmutablePair<>(0, 13_000));
     // other fields like a real device would send
-    events.put("moduleL_temp", new ImmutablePair<>(-5, 225));
-    events.put("moduleR_temp", new ImmutablePair<>(-5, 225));
-    events.put("processor1_temp", new ImmutablePair<>(-5, 225));
-    events.put("processor2_temp", new ImmutablePair<>(-5, 225));
-    events.put("processor3_temp", new ImmutablePair<>(-5, 225));
-    events.put("processor4_temp", new ImmutablePair<>(-5, 225));
-    events.put("inverter_state", new ImmutablePair<>(0, 15));
-    events.put("SoC_regulator", new ImmutablePair<>(26.0f, 29.6f));
+    // events.put("moduleL_temp", new ImmutablePair<>(-5, 225));
+    // events.put("moduleR_temp", new ImmutablePair<>(-5, 225));
+    // events.put("processor1_temp", new ImmutablePair<>(-5, 225));
+    // events.put("processor2_temp", new ImmutablePair<>(-5, 225));
+    // events.put("processor3_temp", new ImmutablePair<>(-5, 225));
+    // events.put("processor4_temp", new ImmutablePair<>(-5, 225));
+    // events.put("inverter_state", new ImmutablePair<>(0, 15));
+    // events.put("SoC_regulator", new ImmutablePair<>(26.0f, 29.6f));
   }
 
   @Override
@@ -83,6 +83,7 @@ public class EventGenerator extends BaseGenerator {
     UUID id = ids[r.nextInt(ids.length - 1)];
 
     int count = Math.max(1, r.nextInt(maxEvents));
+    //-- System.out.println("*** count = " + count);
     List<Object> events = new ArrayList<>(count);
     for (int i = 0; i < count; i++) {
       Object event = getEvent(id);
@@ -92,14 +93,28 @@ public class EventGenerator extends BaseGenerator {
       events.add(event);
     }
 
+    // Example code
+    // ------------
     // then we convert them to be one event per line
-    String message = events.stream().map(event -> {
+    // String message = events.stream().map(event -> {
+    //   try {
+    //     return MAPPER.writeValueAsString(event);
+    //   } catch (IOException e) {
+    //     throw new RuntimeException(e);
+    //   }
+    // }).collect(Collectors.joining("\n"));
+
+    // Modified code
+    // -------------
+    // then we convert them to an array of events that 
+    // can be converted to e.g. an ArrayList<...>
+    String message = "[" + events.stream().map(event -> {
       try {
         return MAPPER.writeValueAsString(event);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
-    }).collect(Collectors.joining("\n"));
+    }).collect(Collectors.joining(",\n")) + "]";
 
     post(message, Optional.of(id.toString()));
   }

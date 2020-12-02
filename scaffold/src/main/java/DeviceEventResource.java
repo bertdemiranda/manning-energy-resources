@@ -31,6 +31,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.common.errors.SerializationException;
 
+//import com.example.ingestbattevents.DeviceEvent;
 import com.example.ingestbattevents.avro.DeviceEventAvro;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -42,6 +43,11 @@ public class DeviceEventResource {
 
     public DeviceEventResource() {
         props = new Properties();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:29092");
+        //props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8090");        
+        props.put("schema.registry.url", "http://localhost:8090");        
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        props.put(ProducerConfig.RETRIES_CONFIG, 0);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
     }
@@ -72,6 +78,7 @@ public class DeviceEventResource {
 
         final ProducerRecord<String, DeviceEventAvro> record = new ProducerRecord<String, DeviceEventAvro>(TOPIC, deviceevent.getDevice_id(), eventavro);
         producer.send(record);
+        producer.close();
     }
         
 }

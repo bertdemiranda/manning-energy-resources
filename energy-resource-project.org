@@ -1,5 +1,7 @@
 * Links 
 ** DropWizard
+   [[https://www.dropwizard.io/en/latest/manual/core.html][Dropwizard Core]]
+   [[https://www.dropwizard.io/en/latest/manual/core.html#managed-objects][DropWizard Managed Objects]]
    [[https://howtodoinjava.com/dropwizard/tutorial-and-hello-world-example/][Dropwizard Tutorial – Hello World Example]]
 ** Avro, Schema
    [[http://avro.apache.org/docs/current/gettingstartedjava.html][Apache Avro™ 1.10.0 Getting Started (Java)]]
@@ -7,7 +9,6 @@
    [[https://docs.confluent.io/current/schema-registry/schema_registry_tutorial.html#schema-registry-tutorial][Schema Registry Tutorials]] / [[https://docs.confluent.io/current/schema-registry/schema_registry_onprem_tutorial.html#schema-registry-onprem-tutorial][On-Premises Schema Registry Tutorial]] (Confluent)
 ** Kafka
 ** [[https://liveproject.manning.com/project/153/52/managing-a-distributed-electrical-grid-in-real-time-with-kafka?][Live Project]]
-
 * Project phase 1 - Ingesting Streaming Events and Realtime Access to Battery State
 ** The Data
 
@@ -30,7 +31,7 @@
    |------------+-----------+-----------|
 
 ** The Device Event generator
-   File [[event-generators/src/main/java/com/jesseyates/manning/EventGenerator.java][EventGenerator.java]] contains a hashmap with possible event fields:
+*** Source File [[event-generators/src/main/java/com/jesseyates/manning/EventGenerator.java][EventGenerator.java]] contains a hashmap with possible event fields:
    #+begin_src java
    (...)
    // setup event field values
@@ -55,7 +56,7 @@
 *** Compiling/running
     $ cd (...)/event-generators
     $ mvn clean/compile/package
-    $ java -jar target/event-generators-1.2-SNAPSHOT-jar-with-dependencies.jar events -e 10 --debug -t http://localhost:8080/device-events
+    $ java -jar target/event-generators-1.2-SNAPSHOT-jar-with-dependencies.jar events -e 1 --debug -t http://localhost:8080/device-events
 ** Dropwizard Webserver
 *** Receiving POST-ed Device events
     File [[scaffold/src/main/java/DeviceEventResource.java][DeviceEventResource.java]] sets up the URL /device-events/{devid} for receiving 
@@ -67,7 +68,7 @@
     $ mvn clean/compile/package
     $ java -jar target/energy-kafka-1.0-SNAPSHOT.jar server ingestbattevents.yml
 ** Avro Schema
-   File [[scaffold/src/main/resources/avro/devicebattevent.avsc][devicebattevent.avsc]] defines the schema to used when sending/receiving device events to/from Kafka.
+   File [[scaffold/src/main/resources/avro/devicebattevent.avsc][devicebattevent.avsc]] defines the schema to use when sending/receiving device events to/from Kafka.
    It defines a simple record consisting of a list of fields enumerated in the tables above.
    This results in generated Java code in file [[scaffold/src/main/generated/com/example/ingestbattevents/avro/DeviceEventAvro.java][DeviceEventAvro.java]] that can be used for this purpose.
 *** Java Producer Code to send incoming device event data through to Kafka
@@ -111,7 +112,32 @@ props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.clas
 *** Running
     $ cd (...)/scaffold
     $ docker-compose -f docker-compose-kafka.yml up
-    runs at localhost:29092
-    schema registry at localhost:8090
+    $# runs at localhost:29092, schema registry at localhost:8090
+**** Log
+bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ curl --silent -X GET http://localhost:8090/subjects/ | jq .
+[
+  "device-events-value"
+]
+bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ curl --silent -X GET http://localhost:8090/subjects/device-events-value/versions/latest | jq .
+{
+  "subject": "device-events-value",
+  "version": 1,
+  "id": 41,
+  "schema": "{\"type\":\"record\",\"name\":\"DeviceEventAvro\",\"namespace\":\"com.example.ingestbattevents.avro\",\"fields\":[{\"name\":\"device_id\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"charging\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"charging_source\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"current_capacity\",\"type\":[\"int\",\"null\"],\"default\":0}]}"
+}
 ** Kafka Streams
+*** Streams configuration
+**** streams.StreamsConfiguration.java#streamsConfiguration sets up a configuration for the streams,
+**** streams.StreamsConfiguration.java#schemaRegistry returns a map containing the URL of the schema resistry.
+*** Device Event Stream topology
+    Look at this example how they use Avro Schema's and serialisation/deserialisation.
+    folder: file:///media/bert/Data/Areas/Training/KafkaStreamsTutorials/kafka-streams-examples
+    file -> file:///media/bert/Data/Areas/Training/KafkaStreamsTutorials/kafka-streams-examples/src/main/java/io/confluent/examples/streams/interactivequeries/kafkamusic/KafkaMusicExample.java
+
+    [[file:///home/bert/DistributedGridProject/manning-energy-resources/scaffold/src/main/java/streams/DeviceEventProcessing.java][streams.DeviceEventProcessing.java]] contains the setup of the device event processing topology.
+    This also implements the DropWizard Managed interface, so that the stream can be started/stopped
+    when the webserver starts/stops.
+    This also calls on StreamsConfiguration to find out where the Kafka Brokers are and
+    where the Schema Resistry can be found.
+
 ** Storing Events in a Database

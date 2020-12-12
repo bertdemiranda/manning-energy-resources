@@ -8,8 +8,8 @@ import io.dropwizard.setup.Environment;
 // import io.dropwizard.setup.Environment.ExecutorService;
 // import io.dropwizard.setup.Environment;
 // import com.example.ingestbattevents.resources.HelloWorldResource;
-// import com.example.ingestbattevents.resources.DeviceEventResource;
-// import com.example.ingestbattevents.health.TemplateHealthCheck;
+import com.example.ingestbattevents.resources.DeviceEventResource;
+import com.example.ingestbattevents.health.TemplateHealthCheck;
 
 public class IngestBattEventsApplication extends Application<IngestBattEventsConfiguration> {
     public static void main(String[] args) throws Exception {

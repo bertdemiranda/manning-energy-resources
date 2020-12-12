@@ -7,13 +7,14 @@ package com.example.ingestbattevents.avro;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 5060180106020985070L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DeviceEventAvro\",\"namespace\":\"com.example.ingestbattevents.avro\",\"fields\":[{\"name\":\"device_id\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"charging\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"charging_source\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"current_capacity\",\"type\":[\"int\",\"null\"],\"default\":0}]}");
+  private static final long serialVersionUID = -2375588199118810645L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DeviceEventAvro\",\"namespace\":\"com.example.ingestbattevents.avro\",\"fields\":[{\"name\":\"device_id\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"charging\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"charging_source\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"current_capacity\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"received_when\",\"type\":[\"long\",\"null\"],\"default\":0}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
   @Deprecated public java.lang.CharSequence device_id;
   @Deprecated public java.lang.Integer charging;
   @Deprecated public java.lang.CharSequence charging_source;
   @Deprecated public java.lang.Integer current_capacity;
+  @Deprecated public java.lang.Long received_when;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -25,11 +26,12 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
   /**
    * All-args constructor.
    */
-  public DeviceEventAvro(java.lang.CharSequence device_id, java.lang.Integer charging, java.lang.CharSequence charging_source, java.lang.Integer current_capacity) {
+  public DeviceEventAvro(java.lang.CharSequence device_id, java.lang.Integer charging, java.lang.CharSequence charging_source, java.lang.Integer current_capacity, java.lang.Long received_when) {
     this.device_id = device_id;
     this.charging = charging;
     this.charging_source = charging_source;
     this.current_capacity = current_capacity;
+    this.received_when = received_when;
   }
 
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
@@ -40,6 +42,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     case 1: return charging;
     case 2: return charging_source;
     case 3: return current_capacity;
+    case 4: return received_when;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -51,6 +54,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     case 1: charging = (java.lang.Integer)value$; break;
     case 2: charging_source = (java.lang.CharSequence)value$; break;
     case 3: current_capacity = (java.lang.Integer)value$; break;
+    case 4: received_when = (java.lang.Long)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -116,6 +120,21 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
   }
 
   /**
+   * Gets the value of the 'received_when' field.
+   */
+  public java.lang.Long getReceivedWhen() {
+    return received_when;
+  }
+
+  /**
+   * Sets the value of the 'received_when' field.
+   * @param value the value to set.
+   */
+  public void setReceivedWhen(java.lang.Long value) {
+    this.received_when = value;
+  }
+
+  /**
    * Creates a new DeviceEventAvro RecordBuilder.
    * @return A new DeviceEventAvro RecordBuilder
    */
@@ -151,6 +170,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     private java.lang.Integer charging;
     private java.lang.CharSequence charging_source;
     private java.lang.Integer current_capacity;
+    private java.lang.Long received_when;
 
     /** Creates a new Builder */
     private Builder() {
@@ -179,6 +199,10 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
         this.current_capacity = data().deepCopy(fields()[3].schema(), other.current_capacity);
         fieldSetFlags()[3] = true;
       }
+      if (isValidValue(fields()[4], other.received_when)) {
+        this.received_when = data().deepCopy(fields()[4].schema(), other.received_when);
+        fieldSetFlags()[4] = true;
+      }
     }
     
     /**
@@ -202,6 +226,10 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
       if (isValidValue(fields()[3], other.current_capacity)) {
         this.current_capacity = data().deepCopy(fields()[3].schema(), other.current_capacity);
         fieldSetFlags()[3] = true;
+      }
+      if (isValidValue(fields()[4], other.received_when)) {
+        this.received_when = data().deepCopy(fields()[4].schema(), other.received_when);
+        fieldSetFlags()[4] = true;
       }
     }
 
@@ -361,6 +389,45 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
       return this;
     }
 
+    /**
+      * Gets the value of the 'received_when' field.
+      * @return The value.
+      */
+    public java.lang.Long getReceivedWhen() {
+      return received_when;
+    }
+
+    /**
+      * Sets the value of the 'received_when' field.
+      * @param value The value of 'received_when'.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setReceivedWhen(java.lang.Long value) {
+      validate(fields()[4], value);
+      this.received_when = value;
+      fieldSetFlags()[4] = true;
+      return this; 
+    }
+
+    /**
+      * Checks whether the 'received_when' field has been set.
+      * @return True if the 'received_when' field has been set, false otherwise.
+      */
+    public boolean hasReceivedWhen() {
+      return fieldSetFlags()[4];
+    }
+
+
+    /**
+      * Clears the value of the 'received_when' field.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearReceivedWhen() {
+      received_when = null;
+      fieldSetFlags()[4] = false;
+      return this;
+    }
+
     @Override
     public DeviceEventAvro build() {
       try {
@@ -369,6 +436,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
         record.charging = fieldSetFlags()[1] ? this.charging : (java.lang.Integer) defaultValue(fields()[1]);
         record.charging_source = fieldSetFlags()[2] ? this.charging_source : (java.lang.CharSequence) defaultValue(fields()[2]);
         record.current_capacity = fieldSetFlags()[3] ? this.current_capacity : (java.lang.Integer) defaultValue(fields()[3]);
+        record.received_when = fieldSetFlags()[4] ? this.received_when : (java.lang.Long) defaultValue(fields()[4]);
         return record;
       } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);

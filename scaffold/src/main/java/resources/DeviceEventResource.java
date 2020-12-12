@@ -1,5 +1,5 @@
-package com.example.ingestbattevents;
-//package com.example.ingestbattevents.resources;
+//package com.example.ingestbattevents;
+package com.example.ingestbattevents.resources;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.Optional;
 import java.util.Properties;
 
-//import com.example.ingestbattevents.api.DeviceEvent;
+import com.example.ingestbattevents.api.DeviceEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 

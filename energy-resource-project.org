@@ -22,6 +22,14 @@
    | charging         | int       | T             | int       | pojo avro db |
    | charging_source  | string    | T             | String    | pojo avro db |
    | current_capacity | int       | y             | int       | pojo avro db |
+   | moduleL_temp     | int       | y             | int       | pojo avro db |
+   | moduleR_temp     | int       | y             | int       | pojo avro db |
+   | processor1_temp  | int       | y             | int       | pojo avro db |
+   | processor2_temp  | int       | y             | int       | pojo avro db |
+   | processor3_temp  | int       | y             | int       | pojo avro db |
+   | processor4_temp  | int       | y             | int       | pojo avro db |
+   | inverter_state   | int       | y             | int       | pojo avro db |
+   | SoC_regulator    | float     | y             | float     | pojo avro db |
    | received_when    | long      | T             | long      | avro db      |
    | ID               |           |               | int       | db           |
    |------------------+-----------+---------------+-----------+--------------|

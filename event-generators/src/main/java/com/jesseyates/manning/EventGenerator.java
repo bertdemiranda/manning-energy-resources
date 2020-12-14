@@ -67,14 +67,14 @@ public class EventGenerator extends BaseGenerator {
     events.put("charging_source", new ImmutablePair<>("solar", "utility"));
     events.put("current_capacity", new ImmutablePair<>(0, 13_000));
     // other fields like a real device would send
-    // events.put("moduleL_temp", new ImmutablePair<>(-5, 225));
-    // events.put("moduleR_temp", new ImmutablePair<>(-5, 225));
-    // events.put("processor1_temp", new ImmutablePair<>(-5, 225));
-    // events.put("processor2_temp", new ImmutablePair<>(-5, 225));
-    // events.put("processor3_temp", new ImmutablePair<>(-5, 225));
-    // events.put("processor4_temp", new ImmutablePair<>(-5, 225));
-    // events.put("inverter_state", new ImmutablePair<>(0, 15));
-    // events.put("SoC_regulator", new ImmutablePair<>(26.0f, 29.6f));
+    events.put("moduleL_temp", new ImmutablePair<>(-5, 225));
+    events.put("moduleR_temp", new ImmutablePair<>(-5, 225));
+    events.put("processor1_temp", new ImmutablePair<>(-5, 225));
+    events.put("processor2_temp", new ImmutablePair<>(-5, 225));
+    events.put("processor3_temp", new ImmutablePair<>(-5, 225));
+    events.put("processor4_temp", new ImmutablePair<>(-5, 225));
+    events.put("inverter_state", new ImmutablePair<>(0, 15));
+    events.put("SoC_regulator", new ImmutablePair<>(26.0f, 29.6f));
   }
 
   @Override

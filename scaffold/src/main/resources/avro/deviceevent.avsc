@@ -24,6 +24,46 @@
         "default": 0
     }
     ,{
+        "name": "moduleL_temp",
+        "type": ["int", "null"],
+        "default": 0
+    }
+    ,{
+        "name": "moduleR_temp",
+        "type": ["int", "null"],
+        "default": 0
+    }
+    ,{
+        "name": "processor1_temp",
+        "type": ["int", "null"],
+        "default": 0
+    }
+    ,{
+        "name": "processor2_temp",
+        "type": ["int", "null"],
+        "default": 0
+    }
+    ,{
+        "name": "processor3_temp",
+        "type": ["int", "null"],
+        "default": 0
+    }
+    ,{
+        "name": "processor4_temp",
+        "type": ["int", "null"],
+        "default": 0
+    }
+    ,{
+        "name": "inverter_state",
+        "type": ["int", "null"],
+        "default": 0
+    }
+    ,{
+        "name": "SoC_regulator",
+        "type": ["float", "null"],
+        "default": 0.0
+    }
+    ,{
         "name": "received_when",
         "type": ["long", "null"],
         "default": 0

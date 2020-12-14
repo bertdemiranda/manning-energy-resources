@@ -7,13 +7,21 @@ package com.example.ingestbattevents.avro;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = -2375588199118810645L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DeviceEventAvro\",\"namespace\":\"com.example.ingestbattevents.avro\",\"fields\":[{\"name\":\"device_id\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"charging\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"charging_source\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"current_capacity\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"received_when\",\"type\":[\"long\",\"null\"],\"default\":0}]}");
+  private static final long serialVersionUID = 6757948980322118416L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DeviceEventAvro\",\"namespace\":\"com.example.ingestbattevents.avro\",\"fields\":[{\"name\":\"device_id\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"charging\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"charging_source\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"current_capacity\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"moduleL_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"moduleR_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor1_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor2_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor3_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor4_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"inverter_state\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"SoC_regulator\",\"type\":[\"float\",\"null\"],\"default\":0.0},{\"name\":\"received_when\",\"type\":[\"long\",\"null\"],\"default\":0}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
   @Deprecated public java.lang.CharSequence device_id;
   @Deprecated public java.lang.Integer charging;
   @Deprecated public java.lang.CharSequence charging_source;
   @Deprecated public java.lang.Integer current_capacity;
+  @Deprecated public java.lang.Integer moduleL_temp;
+  @Deprecated public java.lang.Integer moduleR_temp;
+  @Deprecated public java.lang.Integer processor1_temp;
+  @Deprecated public java.lang.Integer processor2_temp;
+  @Deprecated public java.lang.Integer processor3_temp;
+  @Deprecated public java.lang.Integer processor4_temp;
+  @Deprecated public java.lang.Integer inverter_state;
+  @Deprecated public java.lang.Float SoC_regulator;
   @Deprecated public java.lang.Long received_when;
 
   /**
@@ -26,11 +34,19 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
   /**
    * All-args constructor.
    */
-  public DeviceEventAvro(java.lang.CharSequence device_id, java.lang.Integer charging, java.lang.CharSequence charging_source, java.lang.Integer current_capacity, java.lang.Long received_when) {
+  public DeviceEventAvro(java.lang.CharSequence device_id, java.lang.Integer charging, java.lang.CharSequence charging_source, java.lang.Integer current_capacity, java.lang.Integer moduleL_temp, java.lang.Integer moduleR_temp, java.lang.Integer processor1_temp, java.lang.Integer processor2_temp, java.lang.Integer processor3_temp, java.lang.Integer processor4_temp, java.lang.Integer inverter_state, java.lang.Float SoC_regulator, java.lang.Long received_when) {
     this.device_id = device_id;
     this.charging = charging;
     this.charging_source = charging_source;
     this.current_capacity = current_capacity;
+    this.moduleL_temp = moduleL_temp;
+    this.moduleR_temp = moduleR_temp;
+    this.processor1_temp = processor1_temp;
+    this.processor2_temp = processor2_temp;
+    this.processor3_temp = processor3_temp;
+    this.processor4_temp = processor4_temp;
+    this.inverter_state = inverter_state;
+    this.SoC_regulator = SoC_regulator;
     this.received_when = received_when;
   }
 
@@ -42,7 +58,15 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     case 1: return charging;
     case 2: return charging_source;
     case 3: return current_capacity;
-    case 4: return received_when;
+    case 4: return moduleL_temp;
+    case 5: return moduleR_temp;
+    case 6: return processor1_temp;
+    case 7: return processor2_temp;
+    case 8: return processor3_temp;
+    case 9: return processor4_temp;
+    case 10: return inverter_state;
+    case 11: return SoC_regulator;
+    case 12: return received_when;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -54,7 +78,15 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     case 1: charging = (java.lang.Integer)value$; break;
     case 2: charging_source = (java.lang.CharSequence)value$; break;
     case 3: current_capacity = (java.lang.Integer)value$; break;
-    case 4: received_when = (java.lang.Long)value$; break;
+    case 4: moduleL_temp = (java.lang.Integer)value$; break;
+    case 5: moduleR_temp = (java.lang.Integer)value$; break;
+    case 6: processor1_temp = (java.lang.Integer)value$; break;
+    case 7: processor2_temp = (java.lang.Integer)value$; break;
+    case 8: processor3_temp = (java.lang.Integer)value$; break;
+    case 9: processor4_temp = (java.lang.Integer)value$; break;
+    case 10: inverter_state = (java.lang.Integer)value$; break;
+    case 11: SoC_regulator = (java.lang.Float)value$; break;
+    case 12: received_when = (java.lang.Long)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
   }
@@ -120,6 +152,126 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
   }
 
   /**
+   * Gets the value of the 'moduleL_temp' field.
+   */
+  public java.lang.Integer getModuleLTemp() {
+    return moduleL_temp;
+  }
+
+  /**
+   * Sets the value of the 'moduleL_temp' field.
+   * @param value the value to set.
+   */
+  public void setModuleLTemp(java.lang.Integer value) {
+    this.moduleL_temp = value;
+  }
+
+  /**
+   * Gets the value of the 'moduleR_temp' field.
+   */
+  public java.lang.Integer getModuleRTemp() {
+    return moduleR_temp;
+  }
+
+  /**
+   * Sets the value of the 'moduleR_temp' field.
+   * @param value the value to set.
+   */
+  public void setModuleRTemp(java.lang.Integer value) {
+    this.moduleR_temp = value;
+  }
+
+  /**
+   * Gets the value of the 'processor1_temp' field.
+   */
+  public java.lang.Integer getProcessor1Temp() {
+    return processor1_temp;
+  }
+
+  /**
+   * Sets the value of the 'processor1_temp' field.
+   * @param value the value to set.
+   */
+  public void setProcessor1Temp(java.lang.Integer value) {
+    this.processor1_temp = value;
+  }
+
+  /**
+   * Gets the value of the 'processor2_temp' field.
+   */
+  public java.lang.Integer getProcessor2Temp() {
+    return processor2_temp;
+  }
+
+  /**
+   * Sets the value of the 'processor2_temp' field.
+   * @param value the value to set.
+   */
+  public void setProcessor2Temp(java.lang.Integer value) {
+    this.processor2_temp = value;
+  }
+
+  /**
+   * Gets the value of the 'processor3_temp' field.
+   */
+  public java.lang.Integer getProcessor3Temp() {
+    return processor3_temp;
+  }
+
+  /**
+   * Sets the value of the 'processor3_temp' field.
+   * @param value the value to set.
+   */
+  public void setProcessor3Temp(java.lang.Integer value) {
+    this.processor3_temp = value;
+  }
+
+  /**
+   * Gets the value of the 'processor4_temp' field.
+   */
+  public java.lang.Integer getProcessor4Temp() {
+    return processor4_temp;
+  }
+
+  /**
+   * Sets the value of the 'processor4_temp' field.
+   * @param value the value to set.
+   */
+  public void setProcessor4Temp(java.lang.Integer value) {
+    this.processor4_temp = value;
+  }
+
+  /**
+   * Gets the value of the 'inverter_state' field.
+   */
+  public java.lang.Integer getInverterState() {
+    return inverter_state;
+  }
+
+  /**
+   * Sets the value of the 'inverter_state' field.
+   * @param value the value to set.
+   */
+  public void setInverterState(java.lang.Integer value) {
+    this.inverter_state = value;
+  }
+
+  /**
+   * Gets the value of the 'SoC_regulator' field.
+   */
+  public java.lang.Float getSoCRegulator() {
+    return SoC_regulator;
+  }
+
+  /**
+   * Sets the value of the 'SoC_regulator' field.
+   * @param value the value to set.
+   */
+  public void setSoCRegulator(java.lang.Float value) {
+    this.SoC_regulator = value;
+  }
+
+  /**
    * Gets the value of the 'received_when' field.
    */
   public java.lang.Long getReceivedWhen() {
@@ -170,6 +322,14 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     private java.lang.Integer charging;
     private java.lang.CharSequence charging_source;
     private java.lang.Integer current_capacity;
+    private java.lang.Integer moduleL_temp;
+    private java.lang.Integer moduleR_temp;
+    private java.lang.Integer processor1_temp;
+    private java.lang.Integer processor2_temp;
+    private java.lang.Integer processor3_temp;
+    private java.lang.Integer processor4_temp;
+    private java.lang.Integer inverter_state;
+    private java.lang.Float SoC_regulator;
     private java.lang.Long received_when;
 
     /** Creates a new Builder */
@@ -199,9 +359,41 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
         this.current_capacity = data().deepCopy(fields()[3].schema(), other.current_capacity);
         fieldSetFlags()[3] = true;
       }
-      if (isValidValue(fields()[4], other.received_when)) {
-        this.received_when = data().deepCopy(fields()[4].schema(), other.received_when);
+      if (isValidValue(fields()[4], other.moduleL_temp)) {
+        this.moduleL_temp = data().deepCopy(fields()[4].schema(), other.moduleL_temp);
         fieldSetFlags()[4] = true;
+      }
+      if (isValidValue(fields()[5], other.moduleR_temp)) {
+        this.moduleR_temp = data().deepCopy(fields()[5].schema(), other.moduleR_temp);
+        fieldSetFlags()[5] = true;
+      }
+      if (isValidValue(fields()[6], other.processor1_temp)) {
+        this.processor1_temp = data().deepCopy(fields()[6].schema(), other.processor1_temp);
+        fieldSetFlags()[6] = true;
+      }
+      if (isValidValue(fields()[7], other.processor2_temp)) {
+        this.processor2_temp = data().deepCopy(fields()[7].schema(), other.processor2_temp);
+        fieldSetFlags()[7] = true;
+      }
+      if (isValidValue(fields()[8], other.processor3_temp)) {
+        this.processor3_temp = data().deepCopy(fields()[8].schema(), other.processor3_temp);
+        fieldSetFlags()[8] = true;
+      }
+      if (isValidValue(fields()[9], other.processor4_temp)) {
+        this.processor4_temp = data().deepCopy(fields()[9].schema(), other.processor4_temp);
+        fieldSetFlags()[9] = true;
+      }
+      if (isValidValue(fields()[10], other.inverter_state)) {
+        this.inverter_state = data().deepCopy(fields()[10].schema(), other.inverter_state);
+        fieldSetFlags()[10] = true;
+      }
+      if (isValidValue(fields()[11], other.SoC_regulator)) {
+        this.SoC_regulator = data().deepCopy(fields()[11].schema(), other.SoC_regulator);
+        fieldSetFlags()[11] = true;
+      }
+      if (isValidValue(fields()[12], other.received_when)) {
+        this.received_when = data().deepCopy(fields()[12].schema(), other.received_when);
+        fieldSetFlags()[12] = true;
       }
     }
     
@@ -227,9 +419,41 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
         this.current_capacity = data().deepCopy(fields()[3].schema(), other.current_capacity);
         fieldSetFlags()[3] = true;
       }
-      if (isValidValue(fields()[4], other.received_when)) {
-        this.received_when = data().deepCopy(fields()[4].schema(), other.received_when);
+      if (isValidValue(fields()[4], other.moduleL_temp)) {
+        this.moduleL_temp = data().deepCopy(fields()[4].schema(), other.moduleL_temp);
         fieldSetFlags()[4] = true;
+      }
+      if (isValidValue(fields()[5], other.moduleR_temp)) {
+        this.moduleR_temp = data().deepCopy(fields()[5].schema(), other.moduleR_temp);
+        fieldSetFlags()[5] = true;
+      }
+      if (isValidValue(fields()[6], other.processor1_temp)) {
+        this.processor1_temp = data().deepCopy(fields()[6].schema(), other.processor1_temp);
+        fieldSetFlags()[6] = true;
+      }
+      if (isValidValue(fields()[7], other.processor2_temp)) {
+        this.processor2_temp = data().deepCopy(fields()[7].schema(), other.processor2_temp);
+        fieldSetFlags()[7] = true;
+      }
+      if (isValidValue(fields()[8], other.processor3_temp)) {
+        this.processor3_temp = data().deepCopy(fields()[8].schema(), other.processor3_temp);
+        fieldSetFlags()[8] = true;
+      }
+      if (isValidValue(fields()[9], other.processor4_temp)) {
+        this.processor4_temp = data().deepCopy(fields()[9].schema(), other.processor4_temp);
+        fieldSetFlags()[9] = true;
+      }
+      if (isValidValue(fields()[10], other.inverter_state)) {
+        this.inverter_state = data().deepCopy(fields()[10].schema(), other.inverter_state);
+        fieldSetFlags()[10] = true;
+      }
+      if (isValidValue(fields()[11], other.SoC_regulator)) {
+        this.SoC_regulator = data().deepCopy(fields()[11].schema(), other.SoC_regulator);
+        fieldSetFlags()[11] = true;
+      }
+      if (isValidValue(fields()[12], other.received_when)) {
+        this.received_when = data().deepCopy(fields()[12].schema(), other.received_when);
+        fieldSetFlags()[12] = true;
       }
     }
 
@@ -390,6 +614,318 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     }
 
     /**
+      * Gets the value of the 'moduleL_temp' field.
+      * @return The value.
+      */
+    public java.lang.Integer getModuleLTemp() {
+      return moduleL_temp;
+    }
+
+    /**
+      * Sets the value of the 'moduleL_temp' field.
+      * @param value The value of 'moduleL_temp'.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setModuleLTemp(java.lang.Integer value) {
+      validate(fields()[4], value);
+      this.moduleL_temp = value;
+      fieldSetFlags()[4] = true;
+      return this; 
+    }
+
+    /**
+      * Checks whether the 'moduleL_temp' field has been set.
+      * @return True if the 'moduleL_temp' field has been set, false otherwise.
+      */
+    public boolean hasModuleLTemp() {
+      return fieldSetFlags()[4];
+    }
+
+
+    /**
+      * Clears the value of the 'moduleL_temp' field.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearModuleLTemp() {
+      moduleL_temp = null;
+      fieldSetFlags()[4] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'moduleR_temp' field.
+      * @return The value.
+      */
+    public java.lang.Integer getModuleRTemp() {
+      return moduleR_temp;
+    }
+
+    /**
+      * Sets the value of the 'moduleR_temp' field.
+      * @param value The value of 'moduleR_temp'.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setModuleRTemp(java.lang.Integer value) {
+      validate(fields()[5], value);
+      this.moduleR_temp = value;
+      fieldSetFlags()[5] = true;
+      return this; 
+    }
+
+    /**
+      * Checks whether the 'moduleR_temp' field has been set.
+      * @return True if the 'moduleR_temp' field has been set, false otherwise.
+      */
+    public boolean hasModuleRTemp() {
+      return fieldSetFlags()[5];
+    }
+
+
+    /**
+      * Clears the value of the 'moduleR_temp' field.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearModuleRTemp() {
+      moduleR_temp = null;
+      fieldSetFlags()[5] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'processor1_temp' field.
+      * @return The value.
+      */
+    public java.lang.Integer getProcessor1Temp() {
+      return processor1_temp;
+    }
+
+    /**
+      * Sets the value of the 'processor1_temp' field.
+      * @param value The value of 'processor1_temp'.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setProcessor1Temp(java.lang.Integer value) {
+      validate(fields()[6], value);
+      this.processor1_temp = value;
+      fieldSetFlags()[6] = true;
+      return this; 
+    }
+
+    /**
+      * Checks whether the 'processor1_temp' field has been set.
+      * @return True if the 'processor1_temp' field has been set, false otherwise.
+      */
+    public boolean hasProcessor1Temp() {
+      return fieldSetFlags()[6];
+    }
+
+
+    /**
+      * Clears the value of the 'processor1_temp' field.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearProcessor1Temp() {
+      processor1_temp = null;
+      fieldSetFlags()[6] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'processor2_temp' field.
+      * @return The value.
+      */
+    public java.lang.Integer getProcessor2Temp() {
+      return processor2_temp;
+    }
+
+    /**
+      * Sets the value of the 'processor2_temp' field.
+      * @param value The value of 'processor2_temp'.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setProcessor2Temp(java.lang.Integer value) {
+      validate(fields()[7], value);
+      this.processor2_temp = value;
+      fieldSetFlags()[7] = true;
+      return this; 
+    }
+
+    /**
+      * Checks whether the 'processor2_temp' field has been set.
+      * @return True if the 'processor2_temp' field has been set, false otherwise.
+      */
+    public boolean hasProcessor2Temp() {
+      return fieldSetFlags()[7];
+    }
+
+
+    /**
+      * Clears the value of the 'processor2_temp' field.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearProcessor2Temp() {
+      processor2_temp = null;
+      fieldSetFlags()[7] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'processor3_temp' field.
+      * @return The value.
+      */
+    public java.lang.Integer getProcessor3Temp() {
+      return processor3_temp;
+    }
+
+    /**
+      * Sets the value of the 'processor3_temp' field.
+      * @param value The value of 'processor3_temp'.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setProcessor3Temp(java.lang.Integer value) {
+      validate(fields()[8], value);
+      this.processor3_temp = value;
+      fieldSetFlags()[8] = true;
+      return this; 
+    }
+
+    /**
+      * Checks whether the 'processor3_temp' field has been set.
+      * @return True if the 'processor3_temp' field has been set, false otherwise.
+      */
+    public boolean hasProcessor3Temp() {
+      return fieldSetFlags()[8];
+    }
+
+
+    /**
+      * Clears the value of the 'processor3_temp' field.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearProcessor3Temp() {
+      processor3_temp = null;
+      fieldSetFlags()[8] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'processor4_temp' field.
+      * @return The value.
+      */
+    public java.lang.Integer getProcessor4Temp() {
+      return processor4_temp;
+    }
+
+    /**
+      * Sets the value of the 'processor4_temp' field.
+      * @param value The value of 'processor4_temp'.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setProcessor4Temp(java.lang.Integer value) {
+      validate(fields()[9], value);
+      this.processor4_temp = value;
+      fieldSetFlags()[9] = true;
+      return this; 
+    }
+
+    /**
+      * Checks whether the 'processor4_temp' field has been set.
+      * @return True if the 'processor4_temp' field has been set, false otherwise.
+      */
+    public boolean hasProcessor4Temp() {
+      return fieldSetFlags()[9];
+    }
+
+
+    /**
+      * Clears the value of the 'processor4_temp' field.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearProcessor4Temp() {
+      processor4_temp = null;
+      fieldSetFlags()[9] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'inverter_state' field.
+      * @return The value.
+      */
+    public java.lang.Integer getInverterState() {
+      return inverter_state;
+    }
+
+    /**
+      * Sets the value of the 'inverter_state' field.
+      * @param value The value of 'inverter_state'.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setInverterState(java.lang.Integer value) {
+      validate(fields()[10], value);
+      this.inverter_state = value;
+      fieldSetFlags()[10] = true;
+      return this; 
+    }
+
+    /**
+      * Checks whether the 'inverter_state' field has been set.
+      * @return True if the 'inverter_state' field has been set, false otherwise.
+      */
+    public boolean hasInverterState() {
+      return fieldSetFlags()[10];
+    }
+
+
+    /**
+      * Clears the value of the 'inverter_state' field.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearInverterState() {
+      inverter_state = null;
+      fieldSetFlags()[10] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'SoC_regulator' field.
+      * @return The value.
+      */
+    public java.lang.Float getSoCRegulator() {
+      return SoC_regulator;
+    }
+
+    /**
+      * Sets the value of the 'SoC_regulator' field.
+      * @param value The value of 'SoC_regulator'.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setSoCRegulator(java.lang.Float value) {
+      validate(fields()[11], value);
+      this.SoC_regulator = value;
+      fieldSetFlags()[11] = true;
+      return this; 
+    }
+
+    /**
+      * Checks whether the 'SoC_regulator' field has been set.
+      * @return True if the 'SoC_regulator' field has been set, false otherwise.
+      */
+    public boolean hasSoCRegulator() {
+      return fieldSetFlags()[11];
+    }
+
+
+    /**
+      * Clears the value of the 'SoC_regulator' field.
+      * @return This builder.
+      */
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearSoCRegulator() {
+      SoC_regulator = null;
+      fieldSetFlags()[11] = false;
+      return this;
+    }
+
+    /**
       * Gets the value of the 'received_when' field.
       * @return The value.
       */
@@ -403,9 +939,9 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
       * @return This builder.
       */
     public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setReceivedWhen(java.lang.Long value) {
-      validate(fields()[4], value);
+      validate(fields()[12], value);
       this.received_when = value;
-      fieldSetFlags()[4] = true;
+      fieldSetFlags()[12] = true;
       return this; 
     }
 
@@ -414,7 +950,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
       * @return True if the 'received_when' field has been set, false otherwise.
       */
     public boolean hasReceivedWhen() {
-      return fieldSetFlags()[4];
+      return fieldSetFlags()[12];
     }
 
 
@@ -424,7 +960,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
       */
     public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearReceivedWhen() {
       received_when = null;
-      fieldSetFlags()[4] = false;
+      fieldSetFlags()[12] = false;
       return this;
     }
 
@@ -436,7 +972,15 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
         record.charging = fieldSetFlags()[1] ? this.charging : (java.lang.Integer) defaultValue(fields()[1]);
         record.charging_source = fieldSetFlags()[2] ? this.charging_source : (java.lang.CharSequence) defaultValue(fields()[2]);
         record.current_capacity = fieldSetFlags()[3] ? this.current_capacity : (java.lang.Integer) defaultValue(fields()[3]);
-        record.received_when = fieldSetFlags()[4] ? this.received_when : (java.lang.Long) defaultValue(fields()[4]);
+        record.moduleL_temp = fieldSetFlags()[4] ? this.moduleL_temp : (java.lang.Integer) defaultValue(fields()[4]);
+        record.moduleR_temp = fieldSetFlags()[5] ? this.moduleR_temp : (java.lang.Integer) defaultValue(fields()[5]);
+        record.processor1_temp = fieldSetFlags()[6] ? this.processor1_temp : (java.lang.Integer) defaultValue(fields()[6]);
+        record.processor2_temp = fieldSetFlags()[7] ? this.processor2_temp : (java.lang.Integer) defaultValue(fields()[7]);
+        record.processor3_temp = fieldSetFlags()[8] ? this.processor3_temp : (java.lang.Integer) defaultValue(fields()[8]);
+        record.processor4_temp = fieldSetFlags()[9] ? this.processor4_temp : (java.lang.Integer) defaultValue(fields()[9]);
+        record.inverter_state = fieldSetFlags()[10] ? this.inverter_state : (java.lang.Integer) defaultValue(fields()[10]);
+        record.SoC_regulator = fieldSetFlags()[11] ? this.SoC_regulator : (java.lang.Float) defaultValue(fields()[11]);
+        record.received_when = fieldSetFlags()[12] ? this.received_when : (java.lang.Long) defaultValue(fields()[12]);
         return record;
       } catch (Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);

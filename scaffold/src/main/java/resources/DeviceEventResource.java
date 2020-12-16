@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Date;
 
 import com.example.ingestbattevents.api.DeviceEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,7 +59,9 @@ public class DeviceEventResource {
     public void processDeviceEvent(@PathParam("devid") String devId,
                                   /*@NotNull @Valid*/ ArrayList<DeviceEvent> deviceevents) {
         System.out.println("Charging source = " + deviceevents.get(0).getCharging_source()
-                         + ", charging = " + deviceevents.get(0). getCharging());
+        + ", charging = " + deviceevents.get(0). getCharging()
+        + ", SoC-Regulator = " + deviceevents.get(0). getSoc_regulator()
+        );
 
         for (DeviceEvent deviceevent : deviceevents) {
             sendDeviceEventToKafka(deviceevent);
@@ -74,6 +77,15 @@ public class DeviceEventResource {
                        .setCharging       (deviceevent.getCharging())
                        .setChargingSource (deviceevent.getCharging_source())
                        .setCurrentCapacity(deviceevent.getCurrent_capacity())
+	                   .setModuleLTemp    (deviceevent.getModuleL_temp())
+      	               .setModuleRTemp    (deviceevent.getModuleR_temp())
+	                   .setProcessor1Temp (deviceevent.getProcessor1_temp())
+	                   .setProcessor2Temp (deviceevent.getProcessor2_temp())
+	                   .setProcessor3Temp (deviceevent.getProcessor3_temp())
+    	               .setProcessor4Temp (deviceevent.getProcessor4_temp())
+    	               .setInverterState  (deviceevent.getInverter_state())
+    	               .setSocRegulator   (deviceevent.getSoc_regulator())
+	                   .setReceivedWhen   ((new Date()).getTime())
                        .build();
 
         final ProducerRecord<String, DeviceEventAvro> record = new ProducerRecord<String, DeviceEventAvro>(TOPIC, deviceevent.getDevice_id(), eventavro);

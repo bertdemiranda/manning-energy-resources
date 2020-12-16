@@ -74,7 +74,8 @@ public class EventGenerator extends BaseGenerator {
     events.put("processor3_temp", new ImmutablePair<>(-5, 225));
     events.put("processor4_temp", new ImmutablePair<>(-5, 225));
     events.put("inverter_state", new ImmutablePair<>(0, 15));
-    events.put("SoC_regulator", new ImmutablePair<>(26.0f, 29.6f));
+    //events.put("soc_regulator", new ImmutablePair<>(26, 29));
+    events.put("soc_regulator", new ImmutablePair<>(26.0f, 29.6f));
   }
 
   @Override

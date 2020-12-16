@@ -73,10 +73,10 @@ public class DeviceEvent {
         return inverter_state;
     }
 
-    private float SoC_regulator;
+    private float soc_regulator;
     @JsonProperty
-    public float getSoC_regulator() {
-        return SoC_regulator;
+    public float getSoc_regulator() {
+        return soc_regulator;
     }
 
 

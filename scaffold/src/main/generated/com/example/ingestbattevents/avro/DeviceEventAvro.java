@@ -7,8 +7,8 @@ package com.example.ingestbattevents.avro;
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 6757948980322118416L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DeviceEventAvro\",\"namespace\":\"com.example.ingestbattevents.avro\",\"fields\":[{\"name\":\"device_id\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"charging\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"charging_source\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"current_capacity\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"moduleL_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"moduleR_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor1_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor2_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor3_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor4_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"inverter_state\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"SoC_regulator\",\"type\":[\"float\",\"null\"],\"default\":0.0},{\"name\":\"received_when\",\"type\":[\"long\",\"null\"],\"default\":0}]}");
+  private static final long serialVersionUID = -3037988126394200931L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DeviceEventAvro\",\"namespace\":\"com.example.ingestbattevents.avro\",\"fields\":[{\"name\":\"device_id\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"charging\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"charging_source\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"current_capacity\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"moduleL_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"moduleR_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor1_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor2_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor3_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"processor4_temp\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"inverter_state\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"soc_regulator\",\"type\":[\"float\",\"null\"],\"default\":0.0},{\"name\":\"received_when\",\"type\":[\"long\",\"null\"],\"default\":0}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
   @Deprecated public java.lang.CharSequence device_id;
   @Deprecated public java.lang.Integer charging;
@@ -21,7 +21,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
   @Deprecated public java.lang.Integer processor3_temp;
   @Deprecated public java.lang.Integer processor4_temp;
   @Deprecated public java.lang.Integer inverter_state;
-  @Deprecated public java.lang.Float SoC_regulator;
+  @Deprecated public java.lang.Float soc_regulator;
   @Deprecated public java.lang.Long received_when;
 
   /**
@@ -34,7 +34,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
   /**
    * All-args constructor.
    */
-  public DeviceEventAvro(java.lang.CharSequence device_id, java.lang.Integer charging, java.lang.CharSequence charging_source, java.lang.Integer current_capacity, java.lang.Integer moduleL_temp, java.lang.Integer moduleR_temp, java.lang.Integer processor1_temp, java.lang.Integer processor2_temp, java.lang.Integer processor3_temp, java.lang.Integer processor4_temp, java.lang.Integer inverter_state, java.lang.Float SoC_regulator, java.lang.Long received_when) {
+  public DeviceEventAvro(java.lang.CharSequence device_id, java.lang.Integer charging, java.lang.CharSequence charging_source, java.lang.Integer current_capacity, java.lang.Integer moduleL_temp, java.lang.Integer moduleR_temp, java.lang.Integer processor1_temp, java.lang.Integer processor2_temp, java.lang.Integer processor3_temp, java.lang.Integer processor4_temp, java.lang.Integer inverter_state, java.lang.Float soc_regulator, java.lang.Long received_when) {
     this.device_id = device_id;
     this.charging = charging;
     this.charging_source = charging_source;
@@ -46,7 +46,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     this.processor3_temp = processor3_temp;
     this.processor4_temp = processor4_temp;
     this.inverter_state = inverter_state;
-    this.SoC_regulator = SoC_regulator;
+    this.soc_regulator = soc_regulator;
     this.received_when = received_when;
   }
 
@@ -65,7 +65,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     case 8: return processor3_temp;
     case 9: return processor4_temp;
     case 10: return inverter_state;
-    case 11: return SoC_regulator;
+    case 11: return soc_regulator;
     case 12: return received_when;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
@@ -85,7 +85,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     case 8: processor3_temp = (java.lang.Integer)value$; break;
     case 9: processor4_temp = (java.lang.Integer)value$; break;
     case 10: inverter_state = (java.lang.Integer)value$; break;
-    case 11: SoC_regulator = (java.lang.Float)value$; break;
+    case 11: soc_regulator = (java.lang.Float)value$; break;
     case 12: received_when = (java.lang.Long)value$; break;
     default: throw new org.apache.avro.AvroRuntimeException("Bad index");
     }
@@ -257,18 +257,18 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
   }
 
   /**
-   * Gets the value of the 'SoC_regulator' field.
+   * Gets the value of the 'soc_regulator' field.
    */
-  public java.lang.Float getSoCRegulator() {
-    return SoC_regulator;
+  public java.lang.Float getSocRegulator() {
+    return soc_regulator;
   }
 
   /**
-   * Sets the value of the 'SoC_regulator' field.
+   * Sets the value of the 'soc_regulator' field.
    * @param value the value to set.
    */
-  public void setSoCRegulator(java.lang.Float value) {
-    this.SoC_regulator = value;
+  public void setSocRegulator(java.lang.Float value) {
+    this.soc_regulator = value;
   }
 
   /**
@@ -329,7 +329,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     private java.lang.Integer processor3_temp;
     private java.lang.Integer processor4_temp;
     private java.lang.Integer inverter_state;
-    private java.lang.Float SoC_regulator;
+    private java.lang.Float soc_regulator;
     private java.lang.Long received_when;
 
     /** Creates a new Builder */
@@ -387,8 +387,8 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
         this.inverter_state = data().deepCopy(fields()[10].schema(), other.inverter_state);
         fieldSetFlags()[10] = true;
       }
-      if (isValidValue(fields()[11], other.SoC_regulator)) {
-        this.SoC_regulator = data().deepCopy(fields()[11].schema(), other.SoC_regulator);
+      if (isValidValue(fields()[11], other.soc_regulator)) {
+        this.soc_regulator = data().deepCopy(fields()[11].schema(), other.soc_regulator);
         fieldSetFlags()[11] = true;
       }
       if (isValidValue(fields()[12], other.received_when)) {
@@ -447,8 +447,8 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
         this.inverter_state = data().deepCopy(fields()[10].schema(), other.inverter_state);
         fieldSetFlags()[10] = true;
       }
-      if (isValidValue(fields()[11], other.SoC_regulator)) {
-        this.SoC_regulator = data().deepCopy(fields()[11].schema(), other.SoC_regulator);
+      if (isValidValue(fields()[11], other.soc_regulator)) {
+        this.soc_regulator = data().deepCopy(fields()[11].schema(), other.soc_regulator);
         fieldSetFlags()[11] = true;
       }
       if (isValidValue(fields()[12], other.received_when)) {
@@ -887,40 +887,40 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
     }
 
     /**
-      * Gets the value of the 'SoC_regulator' field.
+      * Gets the value of the 'soc_regulator' field.
       * @return The value.
       */
-    public java.lang.Float getSoCRegulator() {
-      return SoC_regulator;
+    public java.lang.Float getSocRegulator() {
+      return soc_regulator;
     }
 
     /**
-      * Sets the value of the 'SoC_regulator' field.
-      * @param value The value of 'SoC_regulator'.
+      * Sets the value of the 'soc_regulator' field.
+      * @param value The value of 'soc_regulator'.
       * @return This builder.
       */
-    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setSoCRegulator(java.lang.Float value) {
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder setSocRegulator(java.lang.Float value) {
       validate(fields()[11], value);
-      this.SoC_regulator = value;
+      this.soc_regulator = value;
       fieldSetFlags()[11] = true;
       return this; 
     }
 
     /**
-      * Checks whether the 'SoC_regulator' field has been set.
-      * @return True if the 'SoC_regulator' field has been set, false otherwise.
+      * Checks whether the 'soc_regulator' field has been set.
+      * @return True if the 'soc_regulator' field has been set, false otherwise.
       */
-    public boolean hasSoCRegulator() {
+    public boolean hasSocRegulator() {
       return fieldSetFlags()[11];
     }
 
 
     /**
-      * Clears the value of the 'SoC_regulator' field.
+      * Clears the value of the 'soc_regulator' field.
       * @return This builder.
       */
-    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearSoCRegulator() {
-      SoC_regulator = null;
+    public com.example.ingestbattevents.avro.DeviceEventAvro.Builder clearSocRegulator() {
+      soc_regulator = null;
       fieldSetFlags()[11] = false;
       return this;
     }
@@ -979,7 +979,7 @@ public class DeviceEventAvro extends org.apache.avro.specific.SpecificRecordBase
         record.processor3_temp = fieldSetFlags()[8] ? this.processor3_temp : (java.lang.Integer) defaultValue(fields()[8]);
         record.processor4_temp = fieldSetFlags()[9] ? this.processor4_temp : (java.lang.Integer) defaultValue(fields()[9]);
         record.inverter_state = fieldSetFlags()[10] ? this.inverter_state : (java.lang.Integer) defaultValue(fields()[10]);
-        record.SoC_regulator = fieldSetFlags()[11] ? this.SoC_regulator : (java.lang.Float) defaultValue(fields()[11]);
+        record.soc_regulator = fieldSetFlags()[11] ? this.soc_regulator : (java.lang.Float) defaultValue(fields()[11]);
         record.received_when = fieldSetFlags()[12] ? this.received_when : (java.lang.Long) defaultValue(fields()[12]);
         return record;
       } catch (Exception e) {

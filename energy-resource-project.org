@@ -29,14 +29,35 @@
    | processor3_temp  | int       | y             | int       | pojo avro db |
    | processor4_temp  | int       | y             | int       | pojo avro db |
    | inverter_state   | int       | y             | int       | pojo avro db |
-   | SoC_regulator    | float     | y             | float     | pojo avro db |
+   | soc_regulator    | float     | y             | float     | pojo avro db |
    | received_when    | long      | T             | long      | avro db      |
-   | ID               |           |               | int       | db           |
+   |------------------+-----------+---------------+-----------+--------------|
+
+
+   #+NAME: device-event-fields-table-save
+   |------------------+-----------+---------------+-----------+--------------|
+   | Field name       | Avro type | Avro nullable | Java type | Where        |
+   |------------------+-----------+---------------+-----------+--------------|
+   | device_id        | string    | t             | String    | pojo avro db |
+   | charging         | int       | T             | int       | pojo avro db |
+   | charging_source  | string    | T             | String    | pojo avro db |
+   | current_capacity | int       | y             | int       | pojo avro db |
+   | moduleL_temp     | int       | y             | int       | pojo avro db |
+   | moduleR_temp     | int       | y             | int       | pojo avro db |
+   | processor1_temp  | int       | y             | int       | pojo avro db |
+   | processor2_temp  | int       | y             | int       | pojo avro db |
+   | processor3_temp  | int       | y             | int       | pojo avro db |
+   | processor4_temp  | int       | y             | int       | pojo avro db |
+   | inverter_state   | int       | y             | int       | pojo avro db |
+   | soc_regulator    | int       | y             | int       | pojo avro db |
+   | received_when    | long      | T             | long      | avro db      |
+   | id               |           |               | int       | db           |
    |------------------+-----------+---------------+-----------+--------------|
 
 ** Generate Files
 *** Helper functions
-    #+begin_src emacs-lisp
+    #+NAME: helper_functions 
+    #+BEGIN_SRC emacs-lisp
 	    (defun in-pojo-p (where)
 	      "Return T when 'pojo' occurs in where."
 	      (string-match-p (regexp-quote "pojo") where))
@@ -81,12 +102,16 @@
 		(concat
 		 (upcase frst)
 		 rest)))
-    #+end_src
+    #+END_SRC
+
+    #+RESULTS: helper_functions
+    : capfirst
 
     #+RESULTS:
     : capfirst
 
 *** DeviceEvent Pojo
+    #+NAME: pojo_functions 
     #+BEGIN_SRC emacs-lisp
       (defun deviceevent-pojo-fields (datarows)
 	"Generate the private data fields in the Pojo."
@@ -138,10 +163,14 @@
 			      outfile))))))
     #+END_SRC
 
+    #+RESULTS: pojo_functions
+    : generate-deviceevent-pojo
+
     #+RESULTS:
     : generate-deviceevent-pojo
 
 *** DeviceEvent Avro Schema
+    #+NAME: avro_functions 
     #+BEGIN_SRC emacs-lisp
       (defun deviceevent-avroschema-default (avrotype)
 	"Return the default value for the given AVRO type."
@@ -239,13 +268,17 @@
 			      outfile))))))
     #+END_SRC
 
+    #+RESULTS: avro_functions
+    : generate-deviceevent-avroschema
+
     #+RESULTS:
     : generate-deviceevent-avroschema
 
     #+RESULTS: generate-deviceevent-pojo
     : generate-deviceevent-dbimodule
 
-*** DeviceEvent Db module
+*** DeviceEvent Dbi module
+    #+NAME: dbi_functions 
     #+BEGIN_SRC emacs-lisp
       (defun generate-deviceevent-dbimodule (datarows)
 	(let ((dbimodule-output
@@ -264,6 +297,9 @@
 			      (point-max)
 			      outfile))))))
     #+END_SRC
+
+    #+RESULTS: dbi_functions
+    : generate-deviceevent-dbimodule
 
     #+RESULTS:
     : generate-deviceevent-dbimodule
@@ -981,3 +1017,11 @@ bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ cu
        user: root
        password: secret
        url: "jdbc:mysql://0.0.0.0:3306/information_schema"
+* Local variables
+# Local Variables:
+# org-confirm-babel-evaluate: nil
+# eval: (progn (org-babel-goto-named-src-block "helper_functions ") (org-babel-execute-src-block) (outline-hide-sublevels 1))
+# eval: (progn (org-babel-goto-named-src-block "pojo_functions ") (org-babel-execute-src-block) (outline-hide-sublevels 1))
+# eval: (progn (org-babel-goto-named-src-block "avro_functions ") (org-babel-execute-src-block) (outline-hide-sublevels 1))
+# eval: (progn (org-babel-goto-named-src-block "dbi_functions ") (org-babel-execute-src-block) (outline-hide-sublevels 1))
+# End:

@@ -59,7 +59,7 @@
         "default": 0
     }
     ,{
-        "name": "SoC_regulator",
+        "name": "soc_regulator",
         "type": ["float", "null"],
         "default": 0.0
     }

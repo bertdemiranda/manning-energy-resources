@@ -1,5 +1,5 @@
 //package com.example.ingestbattevents;
-package com.example.ingestbattevents.health;
+package health;
 
 import com.codahale.metrics.health.HealthCheck;
 

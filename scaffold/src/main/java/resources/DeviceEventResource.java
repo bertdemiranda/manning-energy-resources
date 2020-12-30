@@ -1,5 +1,5 @@
 //package com.example.ingestbattevents;
-package com.example.ingestbattevents.resources;
+package resources;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Date;
 
-import com.example.ingestbattevents.api.DeviceEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 
@@ -32,7 +31,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.common.errors.SerializationException;
 
-//import com.example.ingestbattevents.DeviceEvent;
+import com.example.ingestbattevents.api.DeviceEvent;
 import com.example.ingestbattevents.avro.DeviceEventAvro;
 
 @Consumes(MediaType.APPLICATION_JSON)

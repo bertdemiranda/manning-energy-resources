@@ -3,8 +3,12 @@ template: Hello, %s!
 
 # defaultName: ${DW_DEFAULT_NAME:-Stranger}
 
-# # Database settings.
+# Database settings.
 # database:
+#   driverClass: com.mysql.cj.jdbc.Driver
+#   user: root
+#   password: secret
+#   url: "jdbc:mysql://0.0.0.0:3306/information_schema"
 
 #   # the name of your JDBC driver
 #   driverClass: org.h2.Driver

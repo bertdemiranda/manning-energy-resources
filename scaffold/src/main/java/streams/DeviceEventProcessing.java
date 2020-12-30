@@ -1,8 +1,12 @@
 package streams;
 import com.example.ingestbattevents.avro.DeviceEventAvro;
-//import com.example.ingestbattevents.DeviceEvent;
+//import com.example.ingestbattevents.api.DeviceEvent;
+//import com.example.ingestbattevents.dbi.DeviceEventDao;
+import dbi.ChargingStateStore;
+import api.ChargingState;
 
 import streams.StreamsConfiguration;
+//import org.jdbi.v3.core.Jdbi;
 
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.Topology;
@@ -24,8 +28,10 @@ public class DeviceEventProcessing implements Managed {
     static final String DEVICE_EVENTS = "device-events";
 
     final KafkaStreams streams;
+//    private Jdbi jdbi;
+    private ChargingStateStore chargingStateStore;
 
-    static Topology buildTopology() {
+    private Topology buildTopology() {
         final Map<String, String> serdeConfig = StreamsConfiguration.schemaRegistry();
         final StringSerde deviceIDSerde = new StringSerde();
 
@@ -38,11 +44,33 @@ public class DeviceEventProcessing implements Managed {
         final KStream<String, DeviceEventAvro> deviceEvents = builder.stream(
             DEVICE_EVENTS,
             Consumed.with(deviceIDSerde, deviceEventSerde));
-        deviceEvents.foreach((key, value) -> System.out.println(key + " => " + value.getCharging()));
+        deviceEvents.foreach((key, value) -> {
+            System.out.println(key + " => " + value.getCharging());
+            StoreEventInChargeStore(value);
+            //LATER: StoreEventInDb(value);
+        }
+        );
         return builder.build();
     }
+
+    // private void StoreEventInDb(DeviceEventAvro deAvro) {
+    //     final DeviceEventDao dao = jdbi.onDemand(DeviceEventDao.class);
+    //     dao.insertevent(deAvro.getCharging(), deAvro.getChargingSource().toString(), deAvro.getCurrentCapacity());
+    // }
+
+    private void StoreEventInChargeStore(DeviceEventAvro deAvro) {
+        chargingStateStore.putChargingState(
+                              deAvro.getDeviceId(), 
+                                     new ChargingState(
+                                         deAvro.getCharging(),
+                                         deAvro.getChargingSource(),
+                                         deAvro.getCurrentCapacity()));
+    }
       
-    public DeviceEventProcessing() {
+    public DeviceEventProcessing(/*Jdbi jdbi, */ ChargingStateStore store) {
+        //this.jdbi               = jdbi;
+        this.chargingStateStore = store;
+
         streams = new KafkaStreams(buildTopology(),
                                    StreamsConfiguration.streamsConfiguration());
     }

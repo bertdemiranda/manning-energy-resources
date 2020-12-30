@@ -3,11 +3,18 @@
    [[https://www.dropwizard.io/en/latest/manual/core.html][Dropwizard Core]]
    [[https://www.dropwizard.io/en/latest/manual/core.html#managed-objects][DropWizard Managed Objects]]
    [[https://howtodoinjava.com/dropwizard/tutorial-and-hello-world-example/][Dropwizard Tutorial – Hello World Example]]
+   [[https://www.programcreek.com/java-api-examples/?code=zheng-wang%2Firontest%2Firontest-master%2Firontest-core-server%2Fsrc%2Fmain%2Fjava%2Fio%2Firontest%2Fdb%2FPropertyExtractorDAO.java#][Irontest example]]
 ** Avro, Schema
    [[http://avro.apache.org/docs/current/gettingstartedjava.html][Apache Avro™ 1.10.0 Getting Started (Java)]]
    Docs Build Applications for Kafka -> [[https://docs.confluent.io/current/schema-registry/index.html][Schema Management]] (Confluent)
    [[https://docs.confluent.io/current/schema-registry/schema_registry_tutorial.html#schema-registry-tutorial][Schema Registry Tutorials]] / [[https://docs.confluent.io/current/schema-registry/schema_registry_onprem_tutorial.html#schema-registry-onprem-tutorial][On-Premises Schema Registry Tutorial]] (Confluent)
 ** Kafka
+** MySQL
+   [[https://dev.mysql.com/doc/][MySQL Documentation]]
+   [[https://dbeaver.io/download/][DBeaver Community Edition 7.3.1]]
+   [[https://dev.mysql.com/doc/workbench/en/][MySQL Workbench]]
+** Java
+   [[https://winterbe.com/posts/2015/04/30/java8-concurrency-tutorial-synchronized-locks-examples/][Java 8 Concurrency Tutorial: Synchronization and Locks]]
 ** [[https://liveproject.manning.com/project/153/52/managing-a-distributed-electrical-grid-in-real-time-with-kafka?][Live Project]]
 * Project phase 1 - Ingesting Streaming Events and Realtime Access to Battery State
 ** The Data Fields
@@ -15,44 +22,24 @@
    The following table specifies the fields in the data that are received from the IoT device 
    and are processed by our server. 
    #+NAME: device-event-fields-table
-   |------------------+-----------+---------------+-----------+--------------|
-   | Field name       | Avro type | Avro nullable | Java type | Where        |
-   |------------------+-----------+---------------+-----------+--------------|
-   | device_id        | string    | t             | String    | pojo avro db |
-   | charging         | int       | T             | int       | pojo avro db |
-   | charging_source  | string    | T             | String    | pojo avro db |
-   | current_capacity | int       | y             | int       | pojo avro db |
-   | moduleL_temp     | int       | y             | int       | pojo avro db |
-   | moduleR_temp     | int       | y             | int       | pojo avro db |
-   | processor1_temp  | int       | y             | int       | pojo avro db |
-   | processor2_temp  | int       | y             | int       | pojo avro db |
-   | processor3_temp  | int       | y             | int       | pojo avro db |
-   | processor4_temp  | int       | y             | int       | pojo avro db |
-   | inverter_state   | int       | y             | int       | pojo avro db |
-   | soc_regulator    | float     | y             | float     | pojo avro db |
-   | received_when    | long      | T             | long      | avro db      |
-   |------------------+-----------+---------------+-----------+--------------|
-
-
-   #+NAME: device-event-fields-table-save
-   |------------------+-----------+---------------+-----------+--------------|
-   | Field name       | Avro type | Avro nullable | Java type | Where        |
-   |------------------+-----------+---------------+-----------+--------------|
-   | device_id        | string    | t             | String    | pojo avro db |
-   | charging         | int       | T             | int       | pojo avro db |
-   | charging_source  | string    | T             | String    | pojo avro db |
-   | current_capacity | int       | y             | int       | pojo avro db |
-   | moduleL_temp     | int       | y             | int       | pojo avro db |
-   | moduleR_temp     | int       | y             | int       | pojo avro db |
-   | processor1_temp  | int       | y             | int       | pojo avro db |
-   | processor2_temp  | int       | y             | int       | pojo avro db |
-   | processor3_temp  | int       | y             | int       | pojo avro db |
-   | processor4_temp  | int       | y             | int       | pojo avro db |
-   | inverter_state   | int       | y             | int       | pojo avro db |
-   | soc_regulator    | int       | y             | int       | pojo avro db |
-   | received_when    | long      | T             | long      | avro db      |
-   | id               |           |               | int       | db           |
-   |------------------+-----------+---------------+-----------+--------------|
+   |------------------+-----------+---------------+-----------+--------------------|
+   | Field name       | Avro type | Avro nullable | Java type | Where              |
+   |------------------+-----------+---------------+-----------+--------------------|
+   | device_id        | string    | t             | String    | pojo avro db cskey |
+   | charging         | int       | T             | int       | pojo avro db cs    |
+   | charging_source  | string    | T             | String    | pojo avro db cs    |
+   | current_capacity | int       | y             | int       | pojo avro db cs    |
+   | moduleL_temp     | int       | y             | int       | pojo avro db       |
+   | moduleR_temp     | int       | y             | int       | pojo avro db       |
+   | processor1_temp  | int       | y             | int       | pojo avro db       |
+   | processor2_temp  | int       | y             | int       | pojo avro db       |
+   | processor3_temp  | int       | y             | int       | pojo avro db       |
+   | processor4_temp  | int       | y             | int       | pojo avro db       |
+   | inverter_state   | int       | y             | int       | pojo avro db       |
+   | soc_regulator    | float     | y             | float     | pojo avro db       |
+   | received_when    | long      | T             | long      | avro db            |
+   | id               |           |               | int       | db                 |
+   |------------------+-----------+---------------+-----------+--------------------|
 
 ** Generate Files
 *** Helper functions
@@ -349,6 +336,9 @@
     $ cd (...)/event-generators
     $ mvn clean/compile/package
     $ java -jar target/event-generators-1.2-SNAPSHOT-jar-with-dependencies.jar events -e 1 --debug -t http://localhost:8080/device-events
+*** Script EventGenerator
+#! /bin/bash
+java -jar target/event-generators-1.2-SNAPSHOT-jar-with-dependencies.jar events -e 1 --debug -t http://localhost:8080/device-events
 ** Dropwizard Webserver
 *** Receiving POST-ed Device events
     File [[scaffold/src/main/java/DeviceEventResource.java][DeviceEventResource.java]] sets up the URL /device-events/{devid} for receiving 
@@ -359,6 +349,10 @@
     $ cd (...)/scaffold
     $ mvn clean/compile/package
     $ java -jar target/energy-kafka-1.0-SNAPSHOT.jar server ingestbattevents.yml
+*** Script WebServer
+#! /bin/bash
+java -jar target/energy-kafka-1.0-SNAPSHOT.jar server ingestbattevents.yml
+
 ** Avro Schema
 *** The Schema file
     File [[scaffold/src/main/resources/avro/devicebattevent.avsc][devicebattevent.avsc]] defines the schema to use when sending/receiving device events to/from Kafka.
@@ -418,6 +412,11 @@ bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ cu
   "id": 41,
   "schema": "{\"type\":\"record\",\"name\":\"DeviceEventAvro\",\"namespace\":\"com.example.ingestbattevents.avro\",\"fields\":[{\"name\":\"device_id\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"charging\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"charging_source\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"current_capacity\",\"type\":[\"int\",\"null\"],\"default\":0}]}"
 }
+*** Script KafkaContainer
+#! /bin/bash
+cd scaffold
+docker-compose -f docker-compose-kafka.yml up
+
 ** Kafka Streams
 *** Streams configuration
 **** streams.StreamsConfiguration.java#streamsConfiguration sets up a configuration for the streams,
@@ -433,8 +432,10 @@ bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ cu
     This also calls on StreamsConfiguration to find out where the Kafka Brokers are and
     where the Schema Resistry can be found.
 
-** Storing Events in a Database
+** LATER Storing Events in a Database
    -> (...)/scaffold/README.md
+   -> [[http://softwaredevelopercentral.blogspot.com/2017/08/dropwizard-mysql-integration-tutorial.html][Dropwizard MySQL Integration Tutorial]]
+   -> [[https://www.w3schools.com/sql/sql_autoincrement.asp][SQL AUTO INCREMENT Field]]
 *** PostGreSQL
 **** Run/stop/remove PostgreSQL db container
      $ docker run --name manning-postgres -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres:12.2
@@ -466,6 +467,7 @@ bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ cu
        user: postgres
        password: secret
        url: "jdbc:postgresql://0.0.0.0:5432/postgres"
+*** [[https://hub.docker.com/_/mysql][MySQL container]]
 *** [[https://dev.mysql.com/doc/workbench/en/][MySQL Workbench]]
 **** Install
      $ nix-env -iA nixpkgs.mysql-workbench
@@ -920,6 +922,13 @@ bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ cu
 
 **** Run
      $ mysql-workbench
+**** Create table
+CREATE TABLE device_events (
+id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+,charging INT
+,charging_source VARCHAR(50)
+,current_capacity INT
+);
 *** MySQL Version 8.0.22
     -> https://github.com/docker-library/mysql/blob/ee33a2144a0effe9459abf02f20a6202ae645e94/8.0/Dockerfile.debian
 
@@ -1008,15 +1017,20 @@ bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ cu
       Bye
       bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ 
 
-**** Connect to the db conatiner via CLI
+**** Script MySqlContainer
+#! /bin/bash
+docker run --name manning-mysql -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 mysql:8.0.22
+**** Connect to the db container via CLI
      $ docker exec -it manning-mysql mysql -P 3306 -u root --password=secret
-**** Enable the mysql dependency in the pom, adding the client libraries to the project , allowing you to actually connect to the database
-**** Add to [[file:///home/bert/DistributedGridProject/manning-energy-resources/scaffold/ingestbattevents.yml][ingestbattevents.yml]]
+**** DONE Enable the mysql dependency in the pom, adding the client libraries to the project, allowing you to actually connect to the database
+**** DONE Add to [[file:///home/bert/DistributedGridProject/manning-energy-resources/scaffold/ingestbattevents.yml][ingestbattevents.yml]]
      database:
        driverClass: com.mysql.cj.jdbc.Driver
        user: root
        password: secret
        url: "jdbc:mysql://0.0.0.0:3306/information_schema"
+** Storing charging state in memory
+
 * Local variables
 # Local Variables:
 # org-confirm-babel-evaluate: nil

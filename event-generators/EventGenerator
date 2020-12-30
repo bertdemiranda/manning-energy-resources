@@ -1,0 +1,2 @@
+#! /bin/bash
+java -jar target/event-generators-1.2-SNAPSHOT-jar-with-dependencies.jar events -e 1 --debug -t http://localhost:8080/device-events

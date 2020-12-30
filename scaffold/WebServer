@@ -1,0 +1,2 @@
+#! /bin/bash
+java -jar target/energy-kafka-1.0-SNAPSHOT.jar server ingestbattevents.yml

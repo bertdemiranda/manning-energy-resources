@@ -47,9 +47,7 @@ public class ChargingStateResource {
     @Path("/{devid}")
     //@Timed
     public Response processChargingState(@PathParam("devid") String devId) {
-        System.out.println(">>>>>>>> GET " + devId);
-        //+ store.containsKey(devid).toString());
-
+        //System.out.println(">>>>>>>> GET " + devId);
         if (chargingStateStore.hasState(devId)) {
             return Response.ok(chargingStateStore.getChargingState(devId)).build();
         }

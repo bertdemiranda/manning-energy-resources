@@ -79,4 +79,5 @@ public class DeviceEvent {
         return soc_regulator;
     }
 
+
 }

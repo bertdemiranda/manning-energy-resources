@@ -12,16 +12,15 @@ public class ChargingStateStore {
     }
 
     public ChargingState getChargingState(String devid) {
-        System.out.println("get(" + devid + ")");
+        //System.out.println("get(" + devid + ")");
         return store.get(devid);
     }
 
     public boolean hasState(String devid) {
-        System.out.println("hasState(" + devid + ")");
-                           //+ store.containsKey(devid).toString());
-        System.out.println("id's in here: "
-                           + store.elements().toString());
-
+        // System.out.println("hasState(" + devid + ")");
+        //                    //+ store.containsKey(devid).toString());
+        // System.out.println("id's in here: "
+        //                    + store.elements().toString());
         return store.containsKey(devid);
     }
 }

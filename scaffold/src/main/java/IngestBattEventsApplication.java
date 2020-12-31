@@ -7,7 +7,6 @@ import io.dropwizard.jdbi3.JdbiFactory;
 import org.jdbi.v3.core.Jdbi;
 // import io.dropwizard.setup.Environment.ExecutorService;
 // import io.dropwizard.setup.Environment;
-// import com.example.ingestbattevents.resources.HelloWorldResource;
 import com.example.ingestbattevents.IngestBattEventsConfiguration;
 
 import resources.ChargingStateResource;
@@ -28,11 +27,6 @@ public class IngestBattEventsApplication extends Application<IngestBattEventsCon
     public static void main(String[] args) throws Exception {
         new IngestBattEventsApplication().run(args);
     }
-
-    // @Override
-    // public String getName() {
-    //     return "hello-world";
-    // }
 
     @Override
     public void initialize(Bootstrap<IngestBattEventsConfiguration> bootstrap) {

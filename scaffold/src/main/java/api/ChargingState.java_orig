@@ -3,12 +3,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ChargingState {
 
-    public ChargingState (int charging, String charging_source, int current_capacity) {
+    public ChargingState (int charging, CharSequence charging_source, int current_capacity) {
         this.charging = charging;
-        this.charging_source = charging_source;
+        this.charging_source = charging_source.toString();
         this.current_capacity = current_capacity;
     }
-
+    
     private int charging;
     @JsonProperty
     public int getCharging() {

@@ -20,8 +20,6 @@ import io.dropwizard.lifecycle.Managed;
 
 import java.util.Map;
 
-//import static java.util.Collections.singletonMap;
-
 public class DeviceEventProcessing implements Managed {
     // See https://www.dropwizard.io/en/latest/manual/core.html#managed-objects
 
@@ -63,7 +61,7 @@ public class DeviceEventProcessing implements Managed {
                               deAvro.getDeviceId(), 
                                      new ChargingState(
                                          deAvro.getCharging(),
-                                         deAvro.getChargingSource(),
+                                         deAvro.getChargingSource().toString(),
                                          deAvro.getCurrentCapacity()));
     }
       

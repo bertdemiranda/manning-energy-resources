@@ -1,94 +1,80 @@
-* Links 
-** DropWizard
-   [[https://www.dropwizard.io/en/latest/manual/core.html][Dropwizard Core]]
-   [[https://www.dropwizard.io/en/latest/manual/core.html#managed-objects][DropWizard Managed Objects]]
-   [[https://howtodoinjava.com/dropwizard/tutorial-and-hello-world-example/][Dropwizard Tutorial – Hello World Example]]
-   [[https://www.programcreek.com/java-api-examples/?code=zheng-wang%2Firontest%2Firontest-master%2Firontest-core-server%2Fsrc%2Fmain%2Fjava%2Fio%2Firontest%2Fdb%2FPropertyExtractorDAO.java#][Irontest example]]
-** Avro, Schema
-   [[http://avro.apache.org/docs/current/gettingstartedjava.html][Apache Avro™ 1.10.0 Getting Started (Java)]]
-   Docs Build Applications for Kafka -> [[https://docs.confluent.io/current/schema-registry/index.html][Schema Management]] (Confluent)
-   [[https://docs.confluent.io/current/schema-registry/schema_registry_tutorial.html#schema-registry-tutorial][Schema Registry Tutorials]] / [[https://docs.confluent.io/current/schema-registry/schema_registry_onprem_tutorial.html#schema-registry-onprem-tutorial][On-Premises Schema Registry Tutorial]] (Confluent)
-** Kafka
-** MySQL
-   [[https://dev.mysql.com/doc/][MySQL Documentation]]
-   [[https://dbeaver.io/download/][DBeaver Community Edition 7.3.1]]
-   [[https://dev.mysql.com/doc/workbench/en/][MySQL Workbench]]
-** Java
-   [[https://winterbe.com/posts/2015/04/30/java8-concurrency-tutorial-synchronized-locks-examples/][Java 8 Concurrency Tutorial: Synchronization and Locks]]
-** [[https://liveproject.manning.com/project/153/52/managing-a-distributed-electrical-grid-in-real-time-with-kafka?][Live Project]]
 * Project phase 1 - Ingesting Streaming Events and Realtime Access to Battery State
 ** The Data Fields
 
    The following table specifies the fields in the data that are received from the IoT device 
    and are processed by our server. 
    #+NAME: device-event-fields-table
-   |------------------+-----------+---------------+-----------+--------------------|
-   | Field name       | Avro type | Avro nullable | Java type | Where              |
-   |------------------+-----------+---------------+-----------+--------------------|
-   | device_id        | string    | t             | String    | pojo avro db cskey |
-   | charging         | int       | T             | int       | pojo avro db cs    |
-   | charging_source  | string    | T             | String    | pojo avro db cs    |
-   | current_capacity | int       | y             | int       | pojo avro db cs    |
-   | moduleL_temp     | int       | y             | int       | pojo avro db       |
-   | moduleR_temp     | int       | y             | int       | pojo avro db       |
-   | processor1_temp  | int       | y             | int       | pojo avro db       |
-   | processor2_temp  | int       | y             | int       | pojo avro db       |
-   | processor3_temp  | int       | y             | int       | pojo avro db       |
-   | processor4_temp  | int       | y             | int       | pojo avro db       |
-   | inverter_state   | int       | y             | int       | pojo avro db       |
-   | soc_regulator    | float     | y             | float     | pojo avro db       |
-   | received_when    | long      | T             | long      | avro db            |
-   | id               |           |               | int       | db                 |
-   |------------------+-----------+---------------+-----------+--------------------|
+   |------------------+-----------+---------------+-----------+-----------------------|
+   | Field name       | Avro type | Avro nullable | Java type | Where                 |
+   |------------------+-----------+---------------+-----------+-----------------------|
+   | device_id        | string    | t             | String    | depojo avro db        |
+   | charging         | int       | T             | int       | depojo avro db cspojo |
+   | charging_source  | string    | T             | String    | depojo avro db cspojo |
+   | current_capacity | int       | y             | int       | depojo avro db cspojo |
+   | moduleL_temp     | int       | y             | int       | depojo avro db        |
+   | moduleR_temp     | int       | y             | int       | depojo avro db        |
+   | processor1_temp  | int       | y             | int       | depojo avro db        |
+   | processor2_temp  | int       | y             | int       | depojo avro db        |
+   | processor3_temp  | int       | y             | int       | depojo avro db        |
+   | processor4_temp  | int       | y             | int       | depojo avro db        |
+   | inverter_state   | int       | y             | int       | depojo avro db        |
+   | soc_regulator    | float     | y             | float     | depojo avro db        |
+   | received_when    | long      | T             | long      | avro db               |
+   | id               |           |               | int       | db                    |
+   |------------------+-----------+---------------+-----------+-----------------------|
 
 ** Generate Files
 *** Helper functions
     #+NAME: helper_functions 
     #+BEGIN_SRC emacs-lisp
-	    (defun in-pojo-p (where)
-	      "Return T when 'pojo' occurs in where."
-	      (string-match-p (regexp-quote "pojo") where))
+      (defun in-depojo-p (where)
+	"Return T when 'depojo' occurs in where."
+	(string-match-p (regexp-quote "depojo") where))
 
-	    (defun in-avro-p (where)
-	      "Return T when 'avro' occurs in where."
-	      (string-match-p (regexp-quote "avro") where))
+      (defun in-avro-p (where)
+	"Return T when 'avro' occurs in where."
+	(string-match-p (regexp-quote "avro") where))
 
-	    (defun in-db-p (where)
-	      "Return T when 'db' occurs in where."
-	      (string-match-p (regexp-quote "db") where))
+      (defun in-db-p (where)
+	"Return T when 'db' occurs in where."
+	(string-match-p (regexp-quote "db") where))
 
-	    (defun fieldname-col (row)
-	      "Return the value from the Field name column in row."
-	      (nth 0 row))
+      (defun in-cspojo-p (where)
+	"Return T when 'cspojo' occurs in where."
+	(string-match-p (regexp-quote "cspojo") where))
 
-	    (defun avrotype-col (row)
-	      "Return the value from the Avro type column in row."
-	      (nth 1 row))
+      (defun fieldname-col (row)
+	"Return the value from the Field name column in row."
+	(nth 0 row))
 
-	    (defun avronullable-p (row)
-	      "Return T when the value from the Avro nullable column in row contains T t Y or y."
-	      (let ((ns (nth 2 row)))
-		(if (string-match-p "[TtYy]" ns)
-		    ns
-		  nil
-		  )
-		))
+      (defun avrotype-col (row)
+	"Return the value from the Avro type column in row."
+	(nth 1 row))
 
-	    (defun javatype-col (row)
-	      "Return the value from the Jave type column in row."
-	      (nth 3 row))
+      (defun avronullable-p (row)
+	"Return T when the value from the Avro nullable column in row contains T t Y or y."
+	(let ((ns (nth 2 row)))
+	  (if (string-match-p "[TtYy]" ns)
+	      ns
+	    nil
+	    )
+	  ))
 
-	    (defun where-col (row)
-	      "Return the value from the Where column in row."
-	      (nth 4 row))
+      (defun javatype-col (row)
+	"Return the value from the Jave type column in row."
+	(nth 3 row))
 
-	    (defun capfirst (text)
-	      "Uppercase the first character in text."
-	      (let ((frst (substring text 0 1))
-		    (rest (substring text 1 nil)))
-		(concat
-		 (upcase frst)
-		 rest)))
+      (defun where-col (row)
+	"Return the value from the Where column in row."
+	(nth 4 row))
+
+      (defun capfirst (text)
+	"Uppercase the first character in text."
+	(let ((frst (substring text 0 1))
+	      (rest (substring text 1 nil)))
+	  (concat
+	   (upcase frst)
+	   rest)))
     #+END_SRC
 
     #+RESULTS: helper_functions
@@ -98,34 +84,34 @@
     : capfirst
 
 *** DeviceEvent Pojo
-    #+NAME: pojo_functions 
+    #+NAME: depojo_functions 
     #+BEGIN_SRC emacs-lisp
       (defun deviceevent-pojo-fields (datarows)
 	"Generate the private data fields in the Pojo."
-	  (let ((output ""))
-	    (dotimes (i (length datarows) output)
-	      (let ((rowi (nth i datarows)))
-		(let ((fieldname (fieldname-col rowi))
-		      (javatype  (javatype-col  rowi))
-		      (inpojo    (in-pojo-p     (where-col rowi))))
-		  (if inpojo
-		      (setq output
-			    (concat
-			     output
-			     "    private " javatype " " fieldname ";\n"
-			     "    @JsonProperty\n"
-			     "    public " javatype " get" (capfirst fieldname) "() {\n"
-			     "        return " fieldname ";\n"
-			     "    }\n\n"
-			     ))))))
-	      output
-	))
+	(let ((output ""))
+	  (dotimes (i (length datarows) output)
+	    (let ((rowi (nth i datarows)))
+	      (let ((fieldname (fieldname-col rowi))
+		    (javatype  (javatype-col  rowi))
+		    (inpojo    (in-depojo-p   (where-col rowi))))
+		(if inpojo
+		    (setq output
+			  (concat
+			   output
+			   "    private " javatype " " fieldname ";\n"
+			   "    @JsonProperty\n"
+			   "    public " javatype " get" (capfirst fieldname) "() {\n"
+			   "        return " fieldname ";\n"
+			   "    }\n\n"
+			   ))))))
+	  output
+	  ))
       (defun deviceevent-pojo-getters (datarows)
 	"Generate the Getters in the Pojo."
 	""
 	)
       (defun generate-deviceevent-pojo (datarows)
-	(let ((pojo-output
+	(let ((depojo-output
 	       (concat
 		"package com.example.ingestbattevents.api;\n"
 		"import com.fasterxml.jackson.annotation.JsonProperty;\n"
@@ -137,18 +123,20 @@
 		"    }\n"
 		"\n"
 		(deviceevent-pojo-fields datarows)
-		"\n"
 		"}\n"
 		)))
 
 	  (with-temp-buffer
 	    (let ((outfile "scaffold/src/main/java/api/DeviceEvent.java"))
-	      (insert pojo-output)
+	      (insert depojo-output)
 	      (when (file-writable-p outfile)
 		(write-region (point-min)
 			      (point-max)
 			      outfile))))))
     #+END_SRC
+
+    #+RESULTS: depojo_functions
+    : generate-deviceevent-pojo
 
     #+RESULTS: pojo_functions
     : generate-deviceevent-pojo
@@ -291,6 +279,91 @@
     #+RESULTS:
     : generate-deviceevent-dbimodule
 
+*** Charging State Pojo
+    #+NAME: cspojo_functions 
+    #+BEGIN_SRC emacs-lisp
+      (defun charging-state-pojo-ctor-args (datarows)
+	"Generate the arguments for the constructor in the Charging State Pojo."
+	(let ((output ""))
+	  (dotimes (i (length datarows) output)
+	    (let ((rowi (nth i datarows)))
+	      (let ((fieldname (fieldname-col rowi))
+		    (javatype  (javatype-col  rowi))
+		    (inpojo    (in-cspojo-p   (where-col rowi))))
+		(if inpojo
+		    (setq output
+			  (concat
+			   output
+			   (if (not (string= "" output))
+			       ", ")
+			   javatype " " fieldname))
+		  ))))
+	  output
+	  ))
+      (defun charging-state-pojo-ctor-assis (datarows)
+	"Generate the constructor in the Charging State Pojo."
+	""
+	(let ((output ""))
+	  (dotimes (i (length datarows) output)
+	    (let ((rowi (nth i datarows)))
+	      (let ((fieldname (fieldname-col rowi))
+		    (javatype  (javatype-col  rowi))
+		    (inpojo    (in-cspojo-p   (where-col rowi))))
+		(if inpojo
+		    (setq output
+			  (concat
+			   output
+			   "        this." fieldname " = " fieldname ";\n"
+	      ))))))
+	  output
+	  ))
+      (defun charging-state-pojo-fields (datarows)
+	"Generate the private data fields in the Charging State Pojo."
+	(let ((output ""))
+	  (dotimes (i (length datarows) output)
+	    (let ((rowi (nth i datarows)))
+	      (let ((fieldname (fieldname-col rowi))
+		    (javatype  (javatype-col  rowi))
+		    (inpojo    (in-cspojo-p   (where-col rowi))))
+		(if inpojo
+		    (setq output
+			  (concat
+			   output
+			   "    private " javatype " " fieldname ";\n"
+			   "    @JsonProperty\n"
+			   "    public " javatype " get" (capfirst fieldname) "() {\n"
+			   "        return " fieldname ";\n"
+			   "    }\n\n"
+			   ))))))
+	  output
+	  ))
+      (defun generate-charging-state-pojo (datarows)
+	(let ((cspojo-output
+	       (concat
+		"package api;\n"
+		"import com.fasterxml.jackson.annotation.JsonProperty;\n"
+		"\n"
+		"public class ChargingState {\n"
+		"\n"
+		"    public ChargingState (" (charging-state-pojo-ctor-args datarows) ") {\n"
+		(charging-state-pojo-ctor-assis datarows)
+		"    }\n\n"
+		(charging-state-pojo-fields datarows)
+		"}\n"
+		)))
+
+	  (with-temp-buffer
+	    (let ((outfile "scaffold/src/main/java/api/ChargingState.java"))
+	      (insert cspojo-output)
+	      (when (file-writable-p outfile)
+		(write-region (point-min)
+			      (point-max)
+			      outfile))))))
+    #+END_SRC
+
+    #+RESULTS: cspojo_functions
+    : generate-charging-state-pojo
+
 *** Top-level function
     #+NAME: generate-for-device-event
     #+BEGIN_SRC emacs-lisp
@@ -298,6 +371,7 @@
 	(progn (generate-deviceevent-pojo       datarows)
 	       (generate-deviceevent-avroschema datarows)
 	       ;;(generate-deviceevent-dbimodule  datarows)
+	       (generate-charging-state-pojo    datarows)
 	       ))
     #+END_SRC
 
@@ -1031,6 +1105,24 @@ docker run --name manning-mysql -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 mysql
        url: "jdbc:mysql://0.0.0.0:3306/information_schema"
 ** Storing charging state in memory
 
+* Links 
+** DropWizard
+   [[https://www.dropwizard.io/en/latest/manual/core.html][Dropwizard Core]]
+   [[https://www.dropwizard.io/en/latest/manual/core.html#managed-objects][DropWizard Managed Objects]]
+   [[https://howtodoinjava.com/dropwizard/tutorial-and-hello-world-example/][Dropwizard Tutorial – Hello World Example]]
+   [[https://www.programcreek.com/java-api-examples/?code=zheng-wang%2Firontest%2Firontest-master%2Firontest-core-server%2Fsrc%2Fmain%2Fjava%2Fio%2Firontest%2Fdb%2FPropertyExtractorDAO.java#][Irontest example]]
+** Avro, Schema
+   [[http://avro.apache.org/docs/current/gettingstartedjava.html][Apache Avro™ 1.10.0 Getting Started (Java)]]
+   Docs Build Applications for Kafka -> [[https://docs.confluent.io/current/schema-registry/index.html][Schema Management]] (Confluent)
+   [[https://docs.confluent.io/current/schema-registry/schema_registry_tutorial.html#schema-registry-tutorial][Schema Registry Tutorials]] / [[https://docs.confluent.io/current/schema-registry/schema_registry_onprem_tutorial.html#schema-registry-onprem-tutorial][On-Premises Schema Registry Tutorial]] (Confluent)
+** Kafka
+** MySQL
+   [[https://dev.mysql.com/doc/][MySQL Documentation]]
+   [[https://dbeaver.io/download/][DBeaver Community Edition 7.3.1]]
+   [[https://dev.mysql.com/doc/workbench/en/][MySQL Workbench]]
+** Java
+   [[https://winterbe.com/posts/2015/04/30/java8-concurrency-tutorial-synchronized-locks-examples/][Java 8 Concurrency Tutorial: Synchronization and Locks]]
+** [[https://liveproject.manning.com/project/153/52/managing-a-distributed-electrical-grid-in-real-time-with-kafka?][Live Project]]
 * Local variables
 # Local Variables:
 # org-confirm-babel-evaluate: nil

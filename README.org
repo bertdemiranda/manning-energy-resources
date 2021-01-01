@@ -14,7 +14,7 @@
   . The charging state Pojo.
 
   Right now, the stream processing is simply extracting the charging state data 
-  from received device events and stooring them in the in-memory store.
+  from received device events and storing them in the in-memory store.
 
   The in-memory store uses a concurrent hashmap, ensuring proper handling of
   multi-threaded calls.

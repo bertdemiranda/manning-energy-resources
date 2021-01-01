@@ -46,11 +46,11 @@ public class ChargingStateResource {
     @GET
     @Path("/{devid}")
     //@Timed
-    public Response processChargingState(@PathParam("devid") String devId) {
+    public Response processChargingState(@PathParam("devid") String devid) {
         //System.out.println(">>>>>>>> GET " + devId);
-        if (chargingStateStore.hasState(devId)) {
-            return Response.ok(chargingStateStore.getChargingState(devId)).build();
-        }
+        Optional<ChargingState> cs = chargingStateStore.getChargingState(devid);
+        if (cs.isPresent())
+            return Response.ok(cs.get()).build();
         return Response.status(Response.Status.NOT_FOUND).build();
     }
        

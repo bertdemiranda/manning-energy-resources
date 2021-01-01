@@ -1,6 +1,7 @@
 package dbi;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 import api.ChargingState;
 
 public class ChargingStateStore {
@@ -11,16 +12,10 @@ public class ChargingStateStore {
         store.put(devid.toString(), state);
     }
 
-    public ChargingState getChargingState(String devid) {
-        //System.out.println("get(" + devid + ")");
-        return store.get(devid);
-    }
-
-    public boolean hasState(String devid) {
-        // System.out.println("hasState(" + devid + ")");
-        //                    //+ store.containsKey(devid).toString());
-        // System.out.println("id's in here: "
-        //                    + store.elements().toString());
-        return store.containsKey(devid);
+    public Optional<ChargingState> getChargingState(String devid) {
+        ChargingState cs = store.get(devid);
+        if (cs == null)
+            return Optional.empty();
+        return Optional.of(cs);
     }
 }

@@ -1,4 +1,24 @@
 * Project phase 1 - Ingesting Streaming Events and Realtime Access to Battery State
+  In phase 1 I have implemented the simple webserver with routings
+  . to receive device events and write these to Kafka and 
+  . to return charging state on request, 
+  some simple stream processing receiving device events from Kafka, 
+  and an in-memory data store for the charging state of the devices.
+
+  The data fields used in the various stages of processing are defined in 
+  the [[The Data Fields][table below]]. From this table the following code [[Generate Files][is generated]]:
+
+  . The device event Pojo,
+  . The Avro schema used in Kafka,
+  . (Later) The Dao code used to store the device event data in an RDBMS,
+  . The charging state Pojo.
+
+  Right now, the stream processing is simply extracting the charging state data 
+  from received device events and stooring them in the in-memory store.
+
+  The in-memory store uses a concurrent hashmap, ensuring proper handling of
+  multi-threaded calls.
+
 ** The Data Fields
 
    The following table specifies the fields in the data that are received from the IoT device 
@@ -416,9 +436,8 @@ java -jar target/event-generators-1.2-SNAPSHOT-jar-with-dependencies.jar events 
 ** Dropwizard Webserver
 *** Receiving POST-ed Device events
     File [[scaffold/src/main/java/DeviceEventResource.java][DeviceEventResource.java]] sets up the URL /device-events/{devid} for receiving 
-    device events with charging data for device with id devid. This handler expects 
-    an JSON array of device event records that are decoded into an ArrayList<[[/home/bert/DistributedGridProject/manning-energy-resources/scaffold/src/main/java/DeviceEvent.java][DeviceEvent]]>.
-*** GET-ting Device Loading information
+    device events with charging and device data for device with id devid. This handler expects 
+    an JSON array of device event records that are decoded into an ArrayList<[[scaffold/src/main/java/DeviceEvent.java][DeviceEvent]]>.
 *** Compiling/running
     $ cd (...)/scaffold
     $ mvn clean/compile/package
@@ -429,38 +448,13 @@ java -jar target/energy-kafka-1.0-SNAPSHOT.jar server ingestbattevents.yml
 
 ** Avro Schema
 *** The Schema file
-    File [[scaffold/src/main/resources/avro/devicebattevent.avsc][devicebattevent.avsc]] defines the schema to use when sending/receiving device events to/from Kafka.
+    File [[scaffold/src/main/resources/avro/devicebattevent.avsc]] defines the schema to use when sending/receiving device events to/from Kafka.
     It defines a simple record consisting of a list of fields enumerated in the tables above.
-    This results in generated Java code in file [[scaffold/src/main/generated/com/example/ingestbattevents/avro/DeviceEventAvro.java][DeviceEventAvro.java]] that can be used for this purpose.
+    This results in generated Java code in file [[scaffold/src/main/generated/com/example/ingestbattevents/avro/DeviceEventAvro.java]] that can be used for this purpose.
 *** The Java Producer Code to send incoming device event data through to Kafka
     This is a [[https://github.com/confluentinc/examples/blob/6.0.0-post/clients/avro/src/main/java/io/confluent/examples/clients/basicavro/ProducerExample.java][full producer example]].
-    The following code was added as a function sendDeviceEventToKafka
-    in file [[scaffold/src/main/java/DeviceEventResource.java][DeviceEventResource.java]]:
-
-    #+begin_src java
-    import io.confluent.kafka.serializers.KafkaAvroSerializer;
-    (...)
-    // Added to the DeviceEventResource constructor
-    props = ....
-    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
-    (...)
-    // Added function
-    private void sendDeviceEventToKafka(DeviceEvent deviceevent) {
-        KafkaProducer<String, DeviceEventAvro> producer = new KafkaProducer<String, DeviceEventAvro>(props);
-
-        DeviceEventAvro.Builder avrobuilder = DeviceEventAvro.newBuilder();
-        DeviceEventAvro eventavro = 
-            avrobuilder.setDeviceId       (deviceevent.getDevice_id())
-                       .setCharging       (deviceevent.getCharging())
-                       .setChargingSource (deviceevent.getCharging_source())
-                       .setCurrentCapacity(deviceevent.getCurrent_capacity())
-                       .build();
-
-        final ProducerRecord<String, DeviceEventAvro> record = new ProducerRecord<String, DeviceEventAvro>(TOPIC, deviceevent.getDevice_id(), eventavro);
-        producer.send(record);
-    }
-    #+end_src
+    The data is actually written to Kafka in function sendDeviceEventToKafka
+    in file [[scaffold/src/main/java/DeviceEventResource.java]].
 ** Running Kafka in container
 *** Install Docker c.s.
     [[https://docs.docker.com/engine/install/ubuntu/][install Docker]]
@@ -497,10 +491,10 @@ docker-compose -f docker-compose-kafka.yml up
 **** streams.StreamsConfiguration.java#schemaRegistry returns a map containing the URL of the schema resistry.
 *** Device Event Stream topology
     Look at this example how they use Avro Schema's and serialisation/deserialisation.
-    folder: file:///media/bert/Data/Areas/Training/KafkaStreamsTutorials/kafka-streams-examples
-    file -> file:///media/bert/Data/Areas/Training/KafkaStreamsTutorials/kafka-streams-examples/src/main/java/io/confluent/examples/streams/interactivequeries/kafkamusic/KafkaMusicExample.java
+    folder: KafkaStreamsTutorials/kafka-streams-examples
+    file -> KafkaStreamsTutorials/kafka-streams-examples/src/main/java/io/confluent/examples/streams/interactivequeries/kafkamusic/KafkaMusicExample.java
 
-    [[file:///home/bert/DistributedGridProject/manning-energy-resources/scaffold/src/main/java/streams/DeviceEventProcessing.java][streams.DeviceEventProcessing.java]] contains the setup of the device event processing topology.
+    [[scaffold/src/main/java/streams/DeviceEventProcessing.java][streams.DeviceEventProcessing.java]] contains the setup of the device event processing topology.
     This also implements the DropWizard Managed interface, so that the stream can be started/stopped
     when the webserver starts/stops.
     This also calls on StreamsConfiguration to find out where the Kafka Brokers are and
@@ -1104,7 +1098,8 @@ docker run --name manning-mysql -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 mysql
        password: secret
        url: "jdbc:mysql://0.0.0.0:3306/information_schema"
 ** Storing charging state in memory
-
+   -> [[https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html][Class ConcurrentHashMap<K,V>]]
+   See files [[scaffold/src/main/java/api/ChargingState.java]] and [[scaffold/src/main/java/dbi/ChargingStateStore.java]].
 * Links 
 ** DropWizard
    [[https://www.dropwizard.io/en/latest/manual/core.html][Dropwizard Core]]

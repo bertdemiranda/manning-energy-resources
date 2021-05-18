@@ -8,10 +8,10 @@ and an in-memory data store for the charging state of the devices.
 The data fields used in the various stages of processing are defined in
 the [[The Data Fields][table below]]. From this table the following code [[Generate Files][is generated]]:
 
-. The device event Pojo,
-. The Avro schema used in Kafka,
-. (Later) The Dao code used to store the device event data in an RDBMS,
-. The charging state Pojo.
+- The device event Pojo,
+- The Avro schema used in Kafka,
+- (Later) The Dao code used to store the device event data in an RDBMS,
+- The charging state Pojo.
 
 Right now, the stream processing is simply extracting the charging state data
 from received device events and storing them in the in-memory store.
@@ -22,380 +22,353 @@ multi-threaded calls.
 ** The Data Fields
 The following table specifies the fields in the data that are received from the IoT device
 and are processed by our server.
-   #+NAME: device-event-fields-table
-   |------------------+-----------+---------------+-----------+-----------------------|
-   | Field name       | Avro type | Avro nullable | Java type | Where                 |
-   |------------------+-----------+---------------+-----------+-----------------------|
-   | device_id        | string    | t             | String    | depojo avro db        |
-   | charging         | int       | T             | int       | depojo avro db cspojo |
-   | charging_source  | string    | T             | String    | depojo avro db cspojo |
-   | current_capacity | int       | y             | int       | depojo avro db cspojo |
-   | moduleL_temp     | int       | y             | int       | depojo avro db        |
-   | moduleR_temp     | int       | y             | int       | depojo avro db        |
-   | processor1_temp  | int       | y             | int       | depojo avro db        |
-   | processor2_temp  | int       | y             | int       | depojo avro db        |
-   | processor3_temp  | int       | y             | int       | depojo avro db        |
-   | processor4_temp  | int       | y             | int       | depojo avro db        |
-   | inverter_state   | int       | y             | int       | depojo avro db        |
-   | soc_regulator    | float     | y             | float     | depojo avro db        |
-   | received_when    | long      | T             | long      | avro db               |
-   | id               |           |               | int       | db                    |
-   |------------------+-----------+---------------+-----------+-----------------------|
+#+NAME: device-event-fields-table
+|------------------+-----------+---------------+-----------+-----------------------|
+| Field name       | Avro type | Avro nullable | Java type | Where                 |
+|------------------+-----------+---------------+-----------+-----------------------|
+| device_id        | string    | t             | String    | depojo avro db        |
+| charging         | int       | T             | int       | depojo avro db cspojo |
+| charging_source  | string    | T             | String    | depojo avro db cspojo |
+| current_capacity | int       | y             | int       | depojo avro db cspojo |
+| moduleL_temp     | int       | y             | int       | depojo avro db        |
+| moduleR_temp     | int       | y             | int       | depojo avro db        |
+| processor1_temp  | int       | y             | int       | depojo avro db        |
+| processor2_temp  | int       | y             | int       | depojo avro db        |
+| processor3_temp  | int       | y             | int       | depojo avro db        |
+| processor4_temp  | int       | y             | int       | depojo avro db        |
+| inverter_state   | int       | y             | int       | depojo avro db        |
+| soc_regulator    | float     | y             | float     | depojo avro db        |
+| received_when    | long      | T             | long      | avro db               |
+| id               |           |               | int       | db                    |
+|------------------+-----------+---------------+-----------+-----------------------|
 
 ** Generate Files
 *** Helper functions
-    #+NAME: helper_functions 
-    #+BEGIN_SRC emacs-lisp
-      (defun in-depojo-p (where)
-	"Return T when 'depojo' occurs in where."
-	(string-match-p (regexp-quote "depojo") where))
+#+NAME: helper_functions
+#+BEGIN_SRC emacs-lisp
+(defun in-depojo-p (where)
+  "Return T when 'depojo' occurs in where."
+  (string-match-p (regexp-quote "depojo") where))
 
-      (defun in-avro-p (where)
-	"Return T when 'avro' occurs in where."
-	(string-match-p (regexp-quote "avro") where))
+(defun in-avro-p (where)
+  "Return T when 'avro' occurs in where."
+  (string-match-p (regexp-quote "avro") where))
 
-      (defun in-db-p (where)
-	"Return T when 'db' occurs in where."
-	(string-match-p (regexp-quote "db") where))
+(defun in-db-p (where)
+  "Return T when 'db' occurs in where."
+  (string-match-p (regexp-quote "db") where))
 
-      (defun in-cspojo-p (where)
-	"Return T when 'cspojo' occurs in where."
-	(string-match-p (regexp-quote "cspojo") where))
+(defun in-cspojo-p (where)
+  "Return T when 'cspojo' occurs in where."
+  (string-match-p (regexp-quote "cspojo") where))
 
-      (defun fieldname-col (row)
-	"Return the value from the Field name column in row."
-	(nth 0 row))
+(defun fieldname-col (row)
+  "Return the value from the Field name column in row."
+  (nth 0 row))
 
-      (defun avrotype-col (row)
-	"Return the value from the Avro type column in row."
-	(nth 1 row))
+(defun avrotype-col (row)
+  "Return the value from the Avro type column in row."
+  (nth 1 row))
 
-      (defun avronullable-p (row)
-	"Return T when the value from the Avro nullable column in row contains T t Y or y."
-	(let ((ns (nth 2 row)))
-	  (if (string-match-p "[TtYy]" ns)
-	      ns
-	    nil
-	    )
-	  ))
+(defun avronullable-p (row)
+  "Return T when the value from the Avro nullable column in row contains T t Y or y."
+  (let ((ns (nth 2 row)))
+    (if (string-match-p "[TtYy]" ns)
+	ns
+      nil
+      )
+    ))
 
-      (defun javatype-col (row)
-	"Return the value from the Jave type column in row."
-	(nth 3 row))
+(defun javatype-col (row)
+  "Return the value from the Jave type column in row."
+  (nth 3 row))
 
-      (defun where-col (row)
-	"Return the value from the Where column in row."
-	(nth 4 row))
+(defun where-col (row)
+  "Return the value from the Where column in row."
+  (nth 4 row))
 
-      (defun capfirst (text)
-	"Uppercase the first character in text."
-	(let ((frst (substring text 0 1))
-	      (rest (substring text 1 nil)))
-	  (concat
-	   (upcase frst)
-	   rest)))
-    #+END_SRC
+(defun capfirst (text)
+  "Uppercase the first character in text."
+  (let ((frst (substring text 0 1))
+	(rest (substring text 1 nil)))
+    (concat
+     (upcase frst)
+     rest)))
+#+END_SRC
 
-    #+RESULTS: helper_functions
-    : capfirst
+#+RESULTS: helper_functions
+: capfirst
 
-    #+RESULTS:
-    : capfirst
+#+RESULTS:
+: capfirst
 
 *** DeviceEvent Pojo
-    #+NAME: depojo_functions 
-    #+BEGIN_SRC emacs-lisp
-      (defun deviceevent-pojo-fields (datarows)
-	"Generate the private data fields in the Pojo."
-	(let ((output ""))
-	  (dotimes (i (length datarows) output)
-	    (let ((rowi (nth i datarows)))
-	      (let ((fieldname (fieldname-col rowi))
-		    (javatype  (javatype-col  rowi))
-		    (inpojo    (in-depojo-p   (where-col rowi))))
-		(if inpojo
-		    (setq output
-			  (concat
-			   output
-			   "    private " javatype " " fieldname ";\n"
-			   "    @JsonProperty\n"
-			   "    public " javatype " get" (capfirst fieldname) "() {\n"
-			   "        return " fieldname ";\n"
-			   "    }\n\n"
-			   ))))))
-	  output
-	  ))
-      (defun deviceevent-pojo-getters (datarows)
-	"Generate the Getters in the Pojo."
-	""
-	)
-      (defun generate-deviceevent-pojo (datarows)
-	(let ((depojo-output
-	       (concat
-		"package com.example.ingestbattevents.api;\n"
-		"import com.fasterxml.jackson.annotation.JsonProperty;\n"
-		"\n"
-		"public class DeviceEvent {\n"
-		"\n"
-		"    public DeviceEvent() {\n"
-		"        // Jackson deserialization\n"
-		"    }\n"
-		"\n"
-		(deviceevent-pojo-fields datarows)
-		"}\n"
-		)))
+#+NAME: depojo_functions
+#+BEGIN_SRC emacs-lisp
+(defun deviceevent-pojo-fields (datarows)
+  "Generate the private data fields in the Pojo."
+  (let ((output ""))
+    (dotimes (i (length datarows) output)
+      (let ((rowi (nth i datarows)))
+	(let ((fieldname (fieldname-col rowi))
+	      (javatype  (javatype-col  rowi))
+	      (inpojo    (in-depojo-p   (where-col rowi))))
+	  (if inpojo
+	      (setq output
+		    (concat
+		     output
+		     "    private " javatype " " fieldname ";\n"
+		     "    @JsonProperty\n"
+		     "    public " javatype " get" (capfirst fieldname) "() {\n"
+		     "        return " fieldname ";\n"
+		     "    }\n\n"
+		     ))))))
+    output
+    ))
+(defun deviceevent-pojo-getters (datarows)
+  "Generate the Getters in the Pojo."
+  ""
+  )
+(defun generate-deviceevent-pojo (datarows)
+  (let ((depojo-output
+	 (concat
+	  "package com.example.ingestbattevents.api;\n"
+	  "import com.fasterxml.jackson.annotation.JsonProperty;\n"
+	  "\n"
+	  "public class DeviceEvent {\n"
+	  "\n"
+	  "    public DeviceEvent() {\n"
+	  "        // Jackson deserialization\n"
+	  "    }\n"
+	  "\n"
+	  (deviceevent-pojo-fields datarows)
+	  "}\n"
+	  )))
 
-	  (with-temp-buffer
-	    (let ((outfile "scaffold/src/main/java/api/DeviceEvent.java"))
-	      (insert depojo-output)
-	      (when (file-writable-p outfile)
-		(write-region (point-min)
-			      (point-max)
-			      outfile))))))
-    #+END_SRC
+    (with-temp-buffer
+      (let ((outfile "scaffold/src/main/java/api/DeviceEvent.java"))
+	(insert depojo-output)
+	(when (file-writable-p outfile)
+	  (write-region (point-min)
+			(point-max)
+			outfile))))))
+#+END_SRC
 
-    #+RESULTS: depojo_functions
-    : generate-deviceevent-pojo
+#+RESULTS: depojo_functions
+: generate-deviceevent-pojo
 
-    #+RESULTS: pojo_functions
-    : generate-deviceevent-pojo
+#+RESULTS: pojo_functions
+: generate-deviceevent-pojo
 
-    #+RESULTS:
-    : generate-deviceevent-pojo
+#+RESULTS:
+: generate-deviceevent-pojo
 
 *** DeviceEvent Avro Schema
-    #+NAME: avro_functions 
-    #+BEGIN_SRC emacs-lisp
-      (defun deviceevent-avroschema-default (avrotype)
-	"Return the default value for the given AVRO type."
-	(cond
-	 ((string= avrotype "boolean") "false")
-	 ((string= avrotype "int"    ) "0"    )
-	 ((string= avrotype "long"   ) "0"    )
-	 ((string= avrotype "float"  ) "0.0"  )
-	 ((string= avrotype "double" ) "0.0"  )
-	 ((string= avrotype "string" ) "\"\"" )
-	 (t                            nil    )
-	 )
-	)
-      (defun deviceevent-avroschema-type (avrotype nullable)
-	"Return the type to be used in the AVRO schema."
-	(let ((atp (concat "\"" avrotype "\"")))
-	  (if nullable
-	      (concat "[" atp ", \"null\"]")
-	    atp
-	    )))
-      (defun deviceevent-avroschema-keyvalue (key value)
-	"Return a JSON formatted key-value pair."
-	(concat "\"" key "\": " value)
-	)
-      (defun deviceevent-avroschema-fields (datarows)
-	"Generate the data fields part of the schema."
-	  (let ((output ""))
-	    (dotimes (i (length datarows) output)
-	      (let ((rowi (nth i datarows)))
-		(let ((fieldname (fieldname-col  rowi))
-		      (avrotype  (avrotype-col   rowi))
-		      (nullable  (avronullable-p rowi))
-		      (inavro    (in-avro-p     (where-col rowi))))
-		  (if inavro
-		      (setq output
-			    (concat
-			     output
-			     (if (> (length output) 0)
-				 "    ,"
-			       "    ")
-			     "{\n"
-			     "        \"name\": \"" fieldname "\",\n"
-			     ;;"        \"type\": [\"string\", \"null\"],\n"
-			     ;;"        \"type\": " avrotype ",\n"
-			     "        " (deviceevent-avroschema-keyvalue "type" (deviceevent-avroschema-type avrotype nullable)) ",\n"
-			     "        " (deviceevent-avroschema-keyvalue "default" (deviceevent-avroschema-default avrotype)) "\n"
-			     "    }\n"
-			     ;; "    private " javatype " " fieldname ";\n"
-			     ;; "    @JsonProperty\n"
-			     ;; "    public " javatype " get" (capfirst fieldname) "() {\n"
-			     ;; "        return " fieldname ";\n"
-			     ;; "    }\n\n"
-			     ))))))
-	      output
-	))
-      (defun generate-deviceevent-avroschema (datarows)
-	(let ((avroschema-output
-	       (concat
-		"{\n"
-		"  \"namespace\": \"com.example.ingestbattevents.avro\",\n"
-		"  \"type\": \"record\",\n"
-		"  \"name\": \"DeviceEventAvro\",\n"
-		"  \"fields\": [\n"
-		(deviceevent-avroschema-fields datarows)
-		;; "    {\n"
-		;; "        \"name\": \"device_id\",\n"
-		;; "        \"type\": [\"string\", \"null\"],\n"
-		;; "        \"default\": \"\"\n"
-		;; "    }\n"
-		;; "    ,{\n"
-		;; "        \"name\": \"charging\",\n"
-		;; "        \"type\": [\"int\",\"null\"],\n"
-		;; "        \"default\": 0\n"
-		;; "    }\n"
-		;; "    ,{\n"
-		;; "        \"name\": \"charging_source\",\n"
-		;; "        \"type\": [\"string\", \"null\"],\n"
-		;; "        \"default\": \"\"\n"
-		;; "    }\n"
-		;; "    ,{\n"
-		;; "        \"name\": \"current_capacity\",\n"
-		;; "        \"type\": [\"int\",\"null\"],\n"
-		;; "        \"default\": 0\n"
-		;; "    }\n"
-		"    ]\n"
-		"}\n"
-		)))
+#+NAME: avro_functions
+#+BEGIN_SRC emacs-lisp
+(defun deviceevent-avroschema-default (avrotype)
+  "Return the default value for the given AVRO type."
+  (cond
+   ((string= avrotype "boolean") "false")
+   ((string= avrotype "int"    ) "0"    )
+   ((string= avrotype "long"   ) "0"    )
+   ((string= avrotype "float"  ) "0.0"  )
+   ((string= avrotype "double" ) "0.0"  )
+   ((string= avrotype "string" ) "\"\"" )
+   (t                            nil    )
+   )
+  )
+(defun deviceevent-avroschema-type (avrotype nullable)
+  "Return the type to be used in the AVRO schema."
+  (let ((atp (concat "\"" avrotype "\"")))
+    (if nullable
+	(concat "[" atp ", \"null\"]")
+      atp
+      )))
+(defun deviceevent-avroschema-keyvalue (key value)
+  "Return a JSON formatted key-value pair."
+  (concat "\"" key "\": " value)
+  )
+(defun deviceevent-avroschema-fields (datarows)
+  "Generate the data fields part of the schema."
+  (let ((output ""))
+    (dotimes (i (length datarows) output)
+      (let ((rowi (nth i datarows)))
+	(let ((fieldname (fieldname-col  rowi))
+	      (avrotype  (avrotype-col   rowi))
+	      (nullable  (avronullable-p rowi))
+	      (inavro    (in-avro-p     (where-col rowi))))
+	  (if inavro
+	      (setq output
+		    (concat
+		     output
+		     (if (> (length output) 0)
+			 "    ,"
+		       "    ")
+		     "{\n"
+		     "        \"name\": \"" fieldname "\",\n"
+		     "        " (deviceevent-avroschema-keyvalue "type" (deviceevent-avroschema-type avrotype nullable)) ",\n"
+		     "        " (deviceevent-avroschema-keyvalue "default" (deviceevent-avroschema-default avrotype)) "\n"
+		     "    }\n"
+		     ))))))
+    output
+    ))
+(defun generate-deviceevent-avroschema (datarows)
+  (let ((avroschema-output
+	 (concat
+	  "{\n"
+	  "  \"namespace\": \"com.example.ingestbattevents.avro\",\n"
+	  "  \"type\": \"record\",\n"
+	  "  \"name\": \"DeviceEventAvro\",\n"
+	  "  \"fields\": [\n"
+	  (deviceevent-avroschema-fields datarows)
+	  "    ]\n"
+	  "}\n"
+	  )))
 
-	  (with-temp-buffer
-	    (let ((outfile "scaffold/src/main/resources/avro/deviceevent.avsc"))
-	      (insert avroschema-output)
-	      (when (file-writable-p outfile)
-		(write-region (point-min)
-			      (point-max)
-			      outfile))))))
-    #+END_SRC
+    (with-temp-buffer
+      (let ((outfile "scaffold/src/main/resources/avro/deviceevent.avsc"))
+	(insert avroschema-output)
+	(when (file-writable-p outfile)
+	  (write-region (point-min)
+			(point-max)
+			outfile))))))
+             #+END_SRC
 
-    #+RESULTS: avro_functions
-    : generate-deviceevent-avroschema
+#+RESULTS: avro_functions
+: generate-deviceevent-avroschema
 
-    #+RESULTS:
-    : generate-deviceevent-avroschema
+#+RESULTS:
+: generate-deviceevent-avroschema
 
-    #+RESULTS: generate-deviceevent-pojo
-    : generate-deviceevent-dbimodule
+#+RESULTS: generate-deviceevent-pojo
+: generate-deviceevent-dbimodule
 
 *** DeviceEvent Dbi module
-    #+NAME: dbi_functions 
-    #+BEGIN_SRC emacs-lisp
-      (defun generate-deviceevent-dbimodule (datarows)
-	(let ((dbimodule-output
-	       (concat
-		"// =====================\n"
-		"// DeviceEvent Dbi module\n"
-		"// =====================\n"
-		"\n"
-		)))
+#+NAME: dbi_functions
+#+BEGIN_SRC emacs-lisp
+(defun generate-deviceevent-dbimodule (datarows)
+  (let ((dbimodule-output
+	 (concat
+	  "// =====================\n"
+	  "// DeviceEvent Dbi module\n"
+	  "// =====================\n"
+	  "\n"
+	  )))
 
-	  (with-temp-buffer
-	    (let ((outfile "scaffold/src/main/java/dbi/DeviceEvent.java"))
-	      (insert dbimodule-output)
-	      (when (file-writable-p outfile)
-		(write-region (point-min)
-			      (point-max)
-			      outfile))))))
-    #+END_SRC
+    (with-temp-buffer
+      (let ((outfile "scaffold/src/main/java/dbi/DeviceEvent.java"))
+	(insert dbimodule-output)
+	(when (file-writable-p outfile)
+	  (write-region (point-min)
+			(point-max)
+			outfile))))))
+#+END_SRC
 
-    #+RESULTS: dbi_functions
-    : generate-deviceevent-dbimodule
+#+RESULTS: dbi_functions
+: generate-deviceevent-dbimodule
 
-    #+RESULTS:
-    : generate-deviceevent-dbimodule
+#+RESULTS:
+: generate-deviceevent-dbimodule
 
 *** Charging State Pojo
-    #+NAME: cspojo_functions 
-    #+BEGIN_SRC emacs-lisp
-      (defun charging-state-pojo-ctor-args (datarows)
-	"Generate the arguments for the constructor in the Charging State Pojo."
-	(let ((output ""))
-	  (dotimes (i (length datarows) output)
-	    (let ((rowi (nth i datarows)))
-	      (let ((fieldname (fieldname-col rowi))
-		    (javatype  (javatype-col  rowi))
-		    (inpojo    (in-cspojo-p   (where-col rowi))))
-		(if inpojo
-		    (setq output
-			  (concat
-			   output
-			   (if (not (string= "" output))
-			       ", ")
-			   javatype " " fieldname))
-		  ))))
-	  output
-	  ))
-      (defun charging-state-pojo-ctor-assis (datarows)
-	"Generate the constructor in the Charging State Pojo."
-	""
-	(let ((output ""))
-	  (dotimes (i (length datarows) output)
-	    (let ((rowi (nth i datarows)))
-	      (let ((fieldname (fieldname-col rowi))
-		    (javatype  (javatype-col  rowi))
-		    (inpojo    (in-cspojo-p   (where-col rowi))))
-		(if inpojo
-		    (setq output
-			  (concat
-			   output
-			   "        this." fieldname " = " fieldname ";\n"
-	      ))))))
-	  output
-	  ))
-      (defun charging-state-pojo-fields (datarows)
-	"Generate the private data fields in the Charging State Pojo."
-	(let ((output ""))
-	  (dotimes (i (length datarows) output)
-	    (let ((rowi (nth i datarows)))
-	      (let ((fieldname (fieldname-col rowi))
-		    (javatype  (javatype-col  rowi))
-		    (inpojo    (in-cspojo-p   (where-col rowi))))
-		(if inpojo
-		    (setq output
-			  (concat
-			   output
-			   "    private " javatype " " fieldname ";\n"
-			   "    @JsonProperty\n"
-			   "    public " javatype " get" (capfirst fieldname) "() {\n"
-			   "        return " fieldname ";\n"
-			   "    }\n\n"
-			   ))))))
-	  output
-	  ))
-      (defun generate-charging-state-pojo (datarows)
-	(let ((cspojo-output
-	       (concat
-		"package api;\n"
-		"import com.fasterxml.jackson.annotation.JsonProperty;\n"
-		"\n"
-		"public class ChargingState {\n"
-		"\n"
-		"    public ChargingState (" (charging-state-pojo-ctor-args datarows) ") {\n"
-		(charging-state-pojo-ctor-assis datarows)
-		"    }\n\n"
-		(charging-state-pojo-fields datarows)
-		"}\n"
-		)))
+#+NAME: cspojo_functions
+#+BEGIN_SRC emacs-lisp
+(defun charging-state-pojo-ctor-args (datarows)
+  "Generate the arguments for the constructor in the Charging State Pojo."
+  (let ((output ""))
+    (dotimes (i (length datarows) output)
+      (let ((rowi (nth i datarows)))
+	(let ((fieldname (fieldname-col rowi))
+	      (javatype  (javatype-col  rowi))
+	      (inpojo    (in-cspojo-p   (where-col rowi))))
+	  (if inpojo
+	      (setq output
+		    (concat
+		     output
+		     (if (not (string= "" output))
+			 ", ")
+		     javatype " " fieldname))
+	    ))))
+    output
+    ))
+(defun charging-state-pojo-ctor-assis (datarows)
+  "Generate the constructor in the Charging State Pojo."
+  ""
+  (let ((output ""))
+    (dotimes (i (length datarows) output)
+      (let ((rowi (nth i datarows)))
+	(let ((fieldname (fieldname-col rowi))
+	      (javatype  (javatype-col  rowi))
+	      (inpojo    (in-cspojo-p   (where-col rowi))))
+	  (if inpojo
+	      (setq output
+		    (concat
+		     output
+		     "        this." fieldname " = " fieldname ";\n"
+	             ))))))
+    output
+    ))
+(defun charging-state-pojo-fields (datarows)
+  "Generate the private data fields in the Charging State Pojo."
+  (let ((output ""))
+    (dotimes (i (length datarows) output)
+      (let ((rowi (nth i datarows)))
+	(let ((fieldname (fieldname-col rowi))
+	      (javatype  (javatype-col  rowi))
+	      (inpojo    (in-cspojo-p   (where-col rowi))))
+	  (if inpojo
+	      (setq output
+		    (concat
+		     output
+		     "    private " javatype " " fieldname ";\n"
+		     "    @JsonProperty\n"
+		     "    public " javatype " get" (capfirst fieldname) "() {\n"
+		     "        return " fieldname ";\n"
+		     "    }\n\n"
+		     ))))))
+    output
+    ))
+(defun generate-charging-state-pojo (datarows)
+  (let ((cspojo-output
+	 (concat
+	  "package api;\n"
+	  "import com.fasterxml.jackson.annotation.JsonProperty;\n"
+	  "\n"
+	  "public class ChargingState {\n"
+	  "\n"
+	  "    public ChargingState (" (charging-state-pojo-ctor-args datarows) ") {\n"
+	  (charging-state-pojo-ctor-assis datarows)
+	  "    }\n\n"
+	  (charging-state-pojo-fields datarows)
+	  "}\n"
+	  )))
 
-	  (with-temp-buffer
-	    (let ((outfile "scaffold/src/main/java/api/ChargingState.java"))
-	      (insert cspojo-output)
-	      (when (file-writable-p outfile)
-		(write-region (point-min)
-			      (point-max)
-			      outfile))))))
-    #+END_SRC
+    (with-temp-buffer
+      (let ((outfile "scaffold/src/main/java/api/ChargingState.java"))
+	(insert cspojo-output)
+	(when (file-writable-p outfile)
+	  (write-region (point-min)
+			(point-max)
+			outfile))))))
+#+END_SRC
 
-    #+RESULTS: cspojo_functions
-    : generate-charging-state-pojo
+#+RESULTS: cspojo_functions
+: generate-charging-state-pojo
 
 *** Top-level function
-    #+NAME: generate-for-device-event
-    #+BEGIN_SRC emacs-lisp
-      (let ((datarows (cdr tbl)))
-	(progn (generate-deviceevent-pojo       datarows)
-	       (generate-deviceevent-avroschema datarows)
-	       ;;(generate-deviceevent-dbimodule  datarows)
-	       (generate-charging-state-pojo    datarows)
-	       ))
-    #+END_SRC
+#+NAME: generate-for-device-event
+#+BEGIN_SRC emacs-lisp
+(let ((datarows (cdr tbl)))
+  (progn (generate-deviceevent-pojo       datarows)
+	 (generate-deviceevent-avroschema datarows)
+	 ;;(generate-deviceevent-dbimodule  datarows)
+	 (generate-charging-state-pojo    datarows)
+	 ))
+#+END_SRC
 
-    #+RESULTS:
-    : generate-for-device-event
+#+RESULTS:
+: generate-for-device-event
 
 *** The call to top-level function
 #+CALL: generate-for-device-event(tbl=device-event-fields-table) :colnames no
@@ -404,27 +377,27 @@ and are processed by our server.
 
 ** The Device Event generator
 *** Source File [[event-generators/src/main/java/com/jesseyates/manning/EventGenerator.java][EventGenerator.java]] contains a hashmap with possible event fields:
-   #+begin_src java
-   (...)
-   // setup event field values
-   {
-     events.put("charging", new ImmutablePair<>(-1000, 1000));
-     events.put("charging_source", new ImmutablePair<>("solar", "utility"));
-     events.put("current_capacity", new ImmutablePair<>(0, 13_000));
-     // other fields like a real device would send
-     // events.put("moduleL_temp", new ImmutablePair<>(-5, 225));
-     // events.put("moduleR_temp", new ImmutablePair<>(-5, 225));
-     // events.put("processor1_temp", new ImmutablePair<>(-5, 225));
-     // events.put("processor2_temp", new ImmutablePair<>(-5, 225));
-     // events.put("processor3_temp", new ImmutablePair<>(-5, 225));
-     // events.put("processor4_temp", new ImmutablePair<>(-5, 225));
-     // events.put("inverter_state", new ImmutablePair<>(0, 15));
-     // events.put("SoC_regulator", new ImmutablePair<>(26.0f, 29.6f));
-   }
-   (...)
-   #+end_src
-   The generator generates a random number of events with random field values. 
-   The event data is then formatted as a JSON array and POST-ed to the web-server.
+#+begin_src java
+(...)
+// setup event field values
+{
+    events.put("charging", new ImmutablePair<>(-1000, 1000));
+    events.put("charging_source", new ImmutablePair<>("solar", "utility"));
+    events.put("current_capacity", new ImmutablePair<>(0, 13_000));
+    // other fields like a real device would send
+    // events.put("moduleL_temp", new ImmutablePair<>(-5, 225));
+    // events.put("moduleR_temp", new ImmutablePair<>(-5, 225));
+    // events.put("processor1_temp", new ImmutablePair<>(-5, 225));
+    // events.put("processor2_temp", new ImmutablePair<>(-5, 225));
+    // events.put("processor3_temp", new ImmutablePair<>(-5, 225));
+    // events.put("processor4_temp", new ImmutablePair<>(-5, 225));
+    // events.put("inverter_state", new ImmutablePair<>(0, 15));
+    // events.put("SoC_regulator", new ImmutablePair<>(26.0f, 29.6f));
+}
+(...)
+#+end_src
+The generator generates a random number of events with random field values.
+The event data is then formatted as a JSON array and POST-ed to the web-server.
 *** Compiling/running
 #+begin_src
 $ cd (...)/event-generators
@@ -555,7 +528,7 @@ database:
   user: postgres
   password: secret
   url: "jdbc:postgresql://0.0.0.0:5432/postgres"
-  #+end_src
+#+end_src
 *** [[https://hub.docker.com/_/mysql][MySQL container]]
 *** [[https://dev.mysql.com/doc/workbench/en/][MySQL Workbench]]
 **** Install
@@ -683,10 +656,10 @@ database:
   user: root
   password: secret
   url: "jdbc:mysql://0.0.0.0:3306/information_schema"
-  #+end_src
+#+end_src
 ** Storing charging state in memory
-   -> [[https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html][Class ConcurrentHashMap<K,V>]]
-   See files [[scaffold/src/main/java/api/ChargingState.java]] and [[scaffold/src/main/java/dbi/ChargingStateStore.java]].
+-> [[https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html][Class ConcurrentHashMap<K,V>]]
+See files [[scaffold/src/main/java/api/ChargingState.java]] and [[scaffold/src/main/java/dbi/ChargingStateStore.java]].
 * Links 
 ** DropWizard
 [[https://www.dropwizard.io/en/latest/manual/core.html][Dropwizard Core]]

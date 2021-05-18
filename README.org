@@ -1,28 +1,27 @@
 * Project phase 1 - Ingesting Streaming Events and Realtime Access to Battery State
-  In phase 1 I have implemented the simple webserver with routings
-  . to receive device events and write these to Kafka and 
-  . to return charging state on request, 
-  some simple stream processing receiving device events from Kafka, 
-  and an in-memory data store for the charging state of the devices.
+In phase 1 I have implemented the simple webserver with routings
+. to receive device events and write these to Kafka and
+. to return charging state on request,
+some simple stream processing receiving device events from Kafka,
+and an in-memory data store for the charging state of the devices.
 
-  The data fields used in the various stages of processing are defined in 
-  the [[The Data Fields][table below]]. From this table the following code [[Generate Files][is generated]]:
+The data fields used in the various stages of processing are defined in
+the [[The Data Fields][table below]]. From this table the following code [[Generate Files][is generated]]:
 
-  . The device event Pojo,
-  . The Avro schema used in Kafka,
-  . (Later) The Dao code used to store the device event data in an RDBMS,
-  . The charging state Pojo.
+. The device event Pojo,
+. The Avro schema used in Kafka,
+. (Later) The Dao code used to store the device event data in an RDBMS,
+. The charging state Pojo.
 
-  Right now, the stream processing is simply extracting the charging state data 
-  from received device events and storing them in the in-memory store.
+Right now, the stream processing is simply extracting the charging state data
+from received device events and storing them in the in-memory store.
 
-  The in-memory store uses a concurrent hashmap, ensuring proper handling of
-  multi-threaded calls.
+The in-memory store uses a concurrent hashmap, ensuring proper handling of
+multi-threaded calls.
 
 ** The Data Fields
-
-   The following table specifies the fields in the data that are received from the IoT device 
-   and are processed by our server. 
+The following table specifies the fields in the data that are received from the IoT device
+and are processed by our server.
    #+NAME: device-event-fields-table
    |------------------+-----------+---------------+-----------+-----------------------|
    | Field name       | Avro type | Avro nullable | Java type | Where                 |
@@ -427,48 +426,60 @@
    The generator generates a random number of events with random field values. 
    The event data is then formatted as a JSON array and POST-ed to the web-server.
 *** Compiling/running
-    $ cd (...)/event-generators
-    $ mvn clean/compile/package
-    $ java -jar target/event-generators-1.2-SNAPSHOT-jar-with-dependencies.jar events -e 1 --debug -t http://localhost:8080/device-events
+#+begin_src
+$ cd (...)/event-generators
+$ mvn clean/compile/package
+$ java -jar target/event-generators-1.2-SNAPSHOT-jar-with-dependencies.jar events -e 1 --debug -t http://localhost:8080/device-events
+#+end_src
 *** Script EventGenerator
+#+begin_src
 #! /bin/bash
 java -jar target/event-generators-1.2-SNAPSHOT-jar-with-dependencies.jar events -e 1 --debug -t http://localhost:8080/device-events
+#+end_src
 ** Dropwizard Webserver
 *** Receiving POST-ed Device events
-    File [[scaffold/src/main/java/DeviceEventResource.java][DeviceEventResource.java]] sets up the URL /device-events/{devid} for receiving 
-    device events with charging and device data for device with id devid. This handler expects 
-    an JSON array of device event records that are decoded into an ArrayList<[[scaffold/src/main/java/DeviceEvent.java][DeviceEvent]]>.
+File [[scaffold/src/main/java/DeviceEventResource.java][DeviceEventResource.java]] sets up the URL /device-events/{devid} for receiving
+device events with charging and device data for device with id devid. This handler expects
+an JSON array of device event records that are decoded into an ArrayList<[[scaffold/src/main/java/DeviceEvent.java][DeviceEvent]]>.
 *** Compiling/running
-    $ cd (...)/scaffold
-    $ mvn clean/compile/package
-    $ java -jar target/energy-kafka-1.0-SNAPSHOT.jar server ingestbattevents.yml
+#+begin_src
+$ cd (...)/scaffold
+$ mvn clean/compile/package
+$ java -jar target/energy-kafka-1.0-SNAPSHOT.jar server ingestbattevents.yml
+#+end_src
 *** Script WebServer
+#+begin_src
 #! /bin/bash
 java -jar target/energy-kafka-1.0-SNAPSHOT.jar server ingestbattevents.yml
-
+#+end_src
 ** Avro Schema
 *** The Schema file
-    File [[scaffold/src/main/resources/avro/devicebattevent.avsc]] defines the schema to use when sending/receiving device events to/from Kafka.
-    It defines a simple record consisting of a list of fields enumerated in the tables above.
-    This results in generated Java code in file [[scaffold/src/main/generated/com/example/ingestbattevents/avro/DeviceEventAvro.java]] that can be used for this purpose.
+File [[scaffold/src/main/resources/avro/devicebattevent.avsc]] defines the schema to use when sending/receiving device events to/from Kafka.
+It defines a simple record consisting of a list of fields enumerated in the tables above.
+This results in generated Java code in file [[scaffold/src/main/generated/com/example/ingestbattevents/avro/DeviceEventAvro.java]] that can be used for this purpose.
 *** The Java Producer Code to send incoming device event data through to Kafka
-    This is a [[https://github.com/confluentinc/examples/blob/6.0.0-post/clients/avro/src/main/java/io/confluent/examples/clients/basicavro/ProducerExample.java][full producer example]].
-    The data is actually written to Kafka in function sendDeviceEventToKafka
-    in file [[scaffold/src/main/java/DeviceEventResource.java]].
+This is a [[https://github.com/confluentinc/examples/blob/6.0.0-post/clients/avro/src/main/java/io/confluent/examples/clients/basicavro/ProducerExample.java][full producer example]].
+The data is actually written to Kafka in function sendDeviceEventToKafka
+in file [[scaffold/src/main/java/DeviceEventResource.java]].
 ** Running Kafka in container
 *** Install Docker c.s.
-    [[https://docs.docker.com/engine/install/ubuntu/][install Docker]]
-    [[https://docs.docker.com/engine/install/linux-postinstall/][Post-installation steps for Linux]]
-    bert@bert-K18Base:~$ sudo groupadd docker
-    groupadd: group 'docker' already exists
-    bert@bert-K18Base:~$ sudo usermod -aG docker $USER)
-    ($ sudo apt install docker-compose)
-    $ docker run hello-world
+[[https://docs.docker.com/engine/install/ubuntu/][install Docker]]
+[[https://docs.docker.com/engine/install/linux-postinstall/][Post-installation steps for Linux]]
+#+begin_src
+bert@bert-K18Base:~$ sudo groupadd docker
+groupadd: group 'docker' already exists
+bert@bert-K18Base:~$ sudo usermod -aG docker $USER)
+($ sudo apt install docker-compose)
+$ docker run hello-world
+#+end_src
 *** Running
-    $ cd (...)/scaffold
-    $ docker-compose -f docker-compose-kafka.yml up
-    $# runs at localhost:29092, schema registry at localhost:8090
+#+begin_src
+$ cd (...)/scaffold
+$ docker-compose -f docker-compose-kafka.yml up
+$# runs at localhost:29092, schema registry at localhost:8090
+#+end_src
 **** Log
+#+begin_src
 bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ curl --silent -X GET http://localhost:8090/subjects/ | jq .
 [
   "device-events-value"
@@ -480,82 +491,101 @@ bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ cu
   "id": 41,
   "schema": "{\"type\":\"record\",\"name\":\"DeviceEventAvro\",\"namespace\":\"com.example.ingestbattevents.avro\",\"fields\":[{\"name\":\"device_id\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"charging\",\"type\":[\"int\",\"null\"],\"default\":0},{\"name\":\"charging_source\",\"type\":[\"string\",\"null\"],\"default\":\"\"},{\"name\":\"current_capacity\",\"type\":[\"int\",\"null\"],\"default\":0}]}"
 }
+#+end_src
 *** Script KafkaContainer
+#+begin_src
 #! /bin/bash
 cd scaffold
 docker-compose -f docker-compose-kafka.yml up
-
+#+end_src
 ** Kafka Streams
 *** Streams configuration
 **** streams.StreamsConfiguration.java#streamsConfiguration sets up a configuration for the streams,
 **** streams.StreamsConfiguration.java#schemaRegistry returns a map containing the URL of the schema resistry.
 *** Device Event Stream topology
-    Look at this example how they use Avro Schema's and serialisation/deserialisation.
-    folder: KafkaStreamsTutorials/kafka-streams-examples
-    file -> KafkaStreamsTutorials/kafka-streams-examples/src/main/java/io/confluent/examples/streams/interactivequeries/kafkamusic/KafkaMusicExample.java
+Look at this example how they use Avro Schema's and serialisation/deserialisation.
+. folder: KafkaStreamsTutorials/kafka-streams-examples
+. file -> KafkaStreamsTutorials/kafka-streams-examples/src/main/java/io/confluent/examples/streams/interactivequeries/kafkamusic/KafkaMusicExample.java
 
-    [[scaffold/src/main/java/streams/DeviceEventProcessing.java][streams.DeviceEventProcessing.java]] contains the setup of the device event processing topology.
-    This also implements the DropWizard Managed interface, so that the stream can be started/stopped
-    when the webserver starts/stops.
-    This also calls on StreamsConfiguration to find out where the Kafka Brokers are and
-    where the Schema Resistry can be found.
+[[scaffold/src/main/java/streams/DeviceEventProcessing.java][streams.DeviceEventProcessing.java]] contains the setup of the device event processing topology.
+This also implements the DropWizard Managed interface, so that the stream can be started/stopped
+when the webserver starts/stops.
+
+This also calls on StreamsConfiguration to find out where the Kafka Brokers are and
+where the Schema Resistry can be found.
 
 ** LATER Storing Events in a Database
-   -> (...)/scaffold/README.md
-   -> [[http://softwaredevelopercentral.blogspot.com/2017/08/dropwizard-mysql-integration-tutorial.html][Dropwizard MySQL Integration Tutorial]]
-   -> [[https://www.w3schools.com/sql/sql_autoincrement.asp][SQL AUTO INCREMENT Field]]
+. -> (...)/scaffold/README.md
+. -> [[http://softwaredevelopercentral.blogspot.com/2017/08/dropwizard-mysql-integration-tutorial.html][Dropwizard MySQL Integration Tutorial]]
+. -> [[https://www.w3schools.com/sql/sql_autoincrement.asp][SQL AUTO INCREMENT Field]]
 *** PostGreSQL
 **** Run/stop/remove PostgreSQL db container
-     $ docker run --name manning-postgres -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres:12.2
-     $ docker stop manning-postgres
-     $ docker rm manning-postgres
+#+begin_src
+$ docker run --name manning-postgres -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres:12.2
+$ docker stop manning-postgres
+$ docker rm manning-postgres
+#+end_src
 **** Connect to the db container via CLI
 ***** [[https://www.postgresql.org/docs/8.1/ddl-schemas.html][Listing Schema's]]
-      bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ docker ps
-      CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-      4b5c7433998c        postgres:12.2       "docker-entrypoint.s…"   8 minutes ago       Up 8 minutes        0.0.0.0:5432->5432/tcp   manning-postgres
+bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+4b5c7433998c        postgres:12.2       "docker-entrypoint.s…"   8 minutes ago       Up 8 minutes        0.0.0.0:5432->5432/tcp   manning-postgres
 
-      bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ docker exec -it manning-postgres psql -U postgres -c “SELECT schema_name FROM information_schema.schemata”
-      psql: warning: extra command-line argument "FROM" ignored
-      psql: warning: extra command-line argument "information_schema.schemata”" ignored
-      psql: error: could not connect to server: FATAL:  database "schema_name" does not exist
+bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ docker exec -it manning-postgres psql -U postgres -c “SELECT schema_name FROM information_schema.schemata”
+psql: warning: extra command-line argument "FROM" ignored
+psql: warning: extra command-line argument "information_schema.schemata”" ignored
+psql: error: could not connect to server: FATAL:  database "schema_name" does not exist
 
-***** [[https://www.postgresql.org/docs/9.1/sql-createtable.html][Create a new table]] in the public database:  
-      bash $ docker exec -it manning-postgres psql -U postgres \ -c
-      "CREATE TABLE devices (uuid varchar, state boolean)"
+***** [[https://www.postgresql.org/docs/9.1/sql-createtable.html][Create a new table]] in the public database:
+#+begin_src
+bash $ docker exec -it manning-postgres psql -U postgres \ -c
+"CREATE TABLE devices (uuid varchar, state boolean)"
+#+end_src
 ***** List tables
-      bash $ docker exec -it manning-postgres psql -U postgres -c '\dt' List of relations Schema | Name |
-      Type | Owner --------+---------+-------+---------- public | devices | table | postgres (1 row)
+#+begin_src
+bash $ docker exec -it manning-postgres psql -U postgres -c '\dt' List of relations Schema | Name |
+Type | Owner --------+---------+-------+---------- public | devices | table | postgres (1 row)
+#+end_src
 **** For DropWizard
-***** Enable the postgres dependency in the pom, adding the client libraries to the project, 
-     allowing to actually connect to the database 
+***** Enable the postgres dependency in the pom, adding the client libraries to the project, allowing to actually connect to the database
 ***** Add to [[file:///home/bert/DistributedGridProject/manning-energy-resources/scaffold/ingestbattevents.yml][ingestbattevents.yml]]
-     database:
-       driverClass: org.postgresql.Driver
-       user: postgres
-       password: secret
-       url: "jdbc:postgresql://0.0.0.0:5432/postgres"
+#+begin_src
+database:
+  driverClass: org.postgresql.Driver
+  user: postgres
+  password: secret
+  url: "jdbc:postgresql://0.0.0.0:5432/postgres"
+  #+end_src
 *** [[https://hub.docker.com/_/mysql][MySQL container]]
 *** [[https://dev.mysql.com/doc/workbench/en/][MySQL Workbench]]
 **** Install
-     $ nix-env -iA nixpkgs.mysql-workbench
+#+begin_src
+$ nix-env -iA nixpkgs.mysql-workbench
+#+end_src
 **** Run
-     $ mysql-workbench
+#+begin_src
+$ mysql-workbench
+#+end_src
 **** Create table
+#+begin_src
 CREATE TABLE device_events (
 id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
 ,charging INT
 ,charging_source VARCHAR(50)
 ,current_capacity INT
 );
+#+end_src
 *** MySQL Version 8.0.22
-    -> https://github.com/docker-library/mysql/blob/ee33a2144a0effe9459abf02f20a6202ae645e94/8.0/Dockerfile.debian
+-> https://github.com/docker-library/mysql/blob/ee33a2144a0effe9459abf02f20a6202ae645e94/8.0/Dockerfile.debian
 
 **** Run/stop/remove MySQL db container
-     $ docker run --name manning-mysql -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql:8.0.22
-     $ docker stop manning-mysql
-     $ docker rm manning-mysql
+#+begin_src
+$ docker run --name manning-mysql -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql:8.0.22
+$ docker stop manning-mysql
+$ docker rm manning-mysql
+#+end_src
 ***** Log
+#+begin_src
       bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ docker run --name manning-mysql -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 -d mysql:8.0.22
       Unable to find image 'mysql:8.0.22' locally
       8.0.22: Pulling from library/mysql
@@ -635,39 +665,45 @@ id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
       mysql> \q
       Bye
       bert@bert-K18Base:~/DistributedGridProject/manning-energy-resources/scaffold$ 
-
+#+end_src
 **** Script MySqlContainer
+#+begin_src
 #! /bin/bash
 docker run --name manning-mysql -e MYSQL_ROOT_PASSWORD=secret -p 3306:3306 mysql:8.0.22
+#+end_src
 **** Connect to the db container via CLI
-     $ docker exec -it manning-mysql mysql -P 3306 -u root --password=secret
+#+begin_src
+$ docker exec -it manning-mysql mysql -P 3306 -u root --password=secret
+#+end_src
 **** DONE Enable the mysql dependency in the pom, adding the client libraries to the project, allowing you to actually connect to the database
 **** DONE Add to [[file:///home/bert/DistributedGridProject/manning-energy-resources/scaffold/ingestbattevents.yml][ingestbattevents.yml]]
-     database:
-       driverClass: com.mysql.cj.jdbc.Driver
-       user: root
-       password: secret
-       url: "jdbc:mysql://0.0.0.0:3306/information_schema"
+#+begin_src
+database:
+  driverClass: com.mysql.cj.jdbc.Driver
+  user: root
+  password: secret
+  url: "jdbc:mysql://0.0.0.0:3306/information_schema"
+  #+end_src
 ** Storing charging state in memory
    -> [[https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ConcurrentHashMap.html][Class ConcurrentHashMap<K,V>]]
    See files [[scaffold/src/main/java/api/ChargingState.java]] and [[scaffold/src/main/java/dbi/ChargingStateStore.java]].
 * Links 
 ** DropWizard
-   [[https://www.dropwizard.io/en/latest/manual/core.html][Dropwizard Core]]
-   [[https://www.dropwizard.io/en/latest/manual/core.html#managed-objects][DropWizard Managed Objects]]
-   [[https://howtodoinjava.com/dropwizard/tutorial-and-hello-world-example/][Dropwizard Tutorial – Hello World Example]]
-   [[https://www.programcreek.com/java-api-examples/?code=zheng-wang%2Firontest%2Firontest-master%2Firontest-core-server%2Fsrc%2Fmain%2Fjava%2Fio%2Firontest%2Fdb%2FPropertyExtractorDAO.java#][Irontest example]]
+[[https://www.dropwizard.io/en/latest/manual/core.html][Dropwizard Core]]
+[[https://www.dropwizard.io/en/latest/manual/core.html#managed-objects][DropWizard Managed Objects]]
+[[https://howtodoinjava.com/dropwizard/tutorial-and-hello-world-example/][Dropwizard Tutorial – Hello World Example]]
+[[https://www.programcreek.com/java-api-examples/?code=zheng-wang%2Firontest%2Firontest-master%2Firontest-core-server%2Fsrc%2Fmain%2Fjava%2Fio%2Firontest%2Fdb%2FPropertyExtractorDAO.java#][Irontest example]]
 ** Avro, Schema
-   [[http://avro.apache.org/docs/current/gettingstartedjava.html][Apache Avro™ 1.10.0 Getting Started (Java)]]
-   Docs Build Applications for Kafka -> [[https://docs.confluent.io/current/schema-registry/index.html][Schema Management]] (Confluent)
-   [[https://docs.confluent.io/current/schema-registry/schema_registry_tutorial.html#schema-registry-tutorial][Schema Registry Tutorials]] / [[https://docs.confluent.io/current/schema-registry/schema_registry_onprem_tutorial.html#schema-registry-onprem-tutorial][On-Premises Schema Registry Tutorial]] (Confluent)
+[[http://avro.apache.org/docs/current/gettingstartedjava.html][Apache Avro™ 1.10.0 Getting Started (Java)]]
+Docs Build Applications for Kafka -> [[https://docs.confluent.io/current/schema-registry/index.html][Schema Management]] (Confluent)
+[[https://docs.confluent.io/current/schema-registry/schema_registry_tutorial.html#schema-registry-tutorial][Schema Registry Tutorials]] / [[https://docs.confluent.io/current/schema-registry/schema_registry_onprem_tutorial.html#schema-registry-onprem-tutorial][On-Premises Schema Registry Tutorial]] (Confluent)
 ** Kafka
 ** MySQL
-   [[https://dev.mysql.com/doc/][MySQL Documentation]]
-   [[https://dbeaver.io/download/][DBeaver Community Edition 7.3.1]]
-   [[https://dev.mysql.com/doc/workbench/en/][MySQL Workbench]]
+[[https://dev.mysql.com/doc/][MySQL Documentation]]
+[[https://dbeaver.io/download/][DBeaver Community Edition 7.3.1]]
+[[https://dev.mysql.com/doc/workbench/en/][MySQL Workbench]]
 ** Java
-   [[https://winterbe.com/posts/2015/04/30/java8-concurrency-tutorial-synchronized-locks-examples/][Java 8 Concurrency Tutorial: Synchronization and Locks]]
+[[https://winterbe.com/posts/2015/04/30/java8-concurrency-tutorial-synchronized-locks-examples/][Java 8 Concurrency Tutorial: Synchronization and Locks]]
 ** [[https://liveproject.manning.com/project/153/52/managing-a-distributed-electrical-grid-in-real-time-with-kafka?][Live Project]]
 * Local variables
 # Local Variables:

@@ -1,7 +1,7 @@
 * Project phase 1 - Ingesting Streaming Events and Realtime Access to Battery State
 In phase 1 I have implemented the simple webserver with routings
-. to receive device events and write these to Kafka and
-. to return charging state on request,
+- to receive device events and write these to Kafka and
+- to return charging state on request,
 some simple stream processing receiving device events from Kafka,
 and an in-memory data store for the charging state of the devices.
 
